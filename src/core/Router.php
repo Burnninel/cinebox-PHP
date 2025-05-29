@@ -1,3 +1,13 @@
 <?php 
-$controller = str_replace('/', '', parse_url($_SERVER['REQUEST_URI'])['path']);
-require __DIR__ . "/../controllers/{$controller}.controller.php";
+
+$rota = str_replace('/', '', parse_url($_SERVER['REQUEST_URI'])['path']);
+
+if($rota === 'filme') {
+    $controller = new FilmeController();
+    $controller->index();   
+} elseif ($rota === 'login') {
+    $controller = new FilmeController();
+    $controller->index();
+} else {
+    echo "Rota não encontrada.";
+}

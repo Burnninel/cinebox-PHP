@@ -2,12 +2,9 @@
 
 class Controller
 {
-    function view($view, $data = [])
+    public function view($view, $data = [])
     {
-        foreach ($data as $key => $value) {
-            $$key = $value;
-        }
-
+        extract($data);
         require __DIR__ . "/../views/templates/app.php";
     }
 }
