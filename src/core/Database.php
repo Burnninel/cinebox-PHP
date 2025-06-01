@@ -24,9 +24,14 @@ class Database
         return $dsn;
     }
 
-    public function query($query, $params = [])
+    public function query($query, $class = null, $params = [])
     {
         $prepare = $this->db->prepare("$query");
+
+         if($class) {
+            $prepare->setFetchMode(PDO::FETCH_CLASS, $class);
+        }
+
         $prepare->execute($params);
         return $prepare;
     }
