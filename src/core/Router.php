@@ -5,6 +5,8 @@ $path = str_replace('/', '', parse_url($_SERVER['REQUEST_URI'])['path']);
 $routes = [
     '' => 'IndexController',
     'filme' => 'FilmeController',
+    'login' => 'LoginController',
+    'registrar' => 'RegistrarController',
 ];
 
 if(!array_key_exists($path, $routes)) {
