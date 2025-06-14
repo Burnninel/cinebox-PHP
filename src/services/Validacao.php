@@ -109,7 +109,7 @@ class Validacao
     {
         foreach ($this->erros as $erro) {
             [$campo, $mensagem] = $erro;
-            flash()->setMensagem('error', $campo, $mensagem);
+            flash()->setMensagem('error', $mensagem, $campo,);
         }
     }
 }

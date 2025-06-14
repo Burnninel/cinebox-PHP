@@ -29,7 +29,7 @@ class RegistrarController extends Controller
                 ]
             );
 
-            flash()->setMensagem('success', 'usuario', 'Usuario registrado com sucesso!');
+            flash()->setMensagem('success', 'Usuario registrado com sucesso!', 'usuario');
             header('Location: /login');
             exit;
         }
