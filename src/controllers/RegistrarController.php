@@ -25,7 +25,7 @@ class RegistrarController extends Controller
                 params: [
                     'nome' => $_POST['nome'],
                     'email' => $_POST['email'],
-                    'senha' => $_POST['senha'],
+                    'senha' => password_hash($_POST['senha'], PASSWORD_BCRYPT),
                 ]
             );
 
