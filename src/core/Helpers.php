@@ -18,3 +18,8 @@ function config($chave = null)
 
     return $config;
 }
+
+function flash()
+{
+    return new Flash;
+}

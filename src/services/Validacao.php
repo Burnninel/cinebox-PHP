@@ -48,27 +48,27 @@ class Validacao
             }
         }
 
-        return $validacao->erros;
+        return $validacao;
     }
 
     private function required($campo, $valor)
     {
         if (empty($valor)) {
-            $this->erros[] = "$campo é obrigatório";
+            $this->erros[] = [$campo, "$campo é obrigatório"];
         }
     }
 
     private function email($campo, $valor)
     {
         if (!filter_var($valor, FILTER_VALIDATE_EMAIL)) {
-            $this->erros[] = "$campo é inválido";
+            $this->erros[] = [$campo, "$campo é inválido"];
         }
     }
 
     private function confirmed($campo, $valor, $confirmacao)
     {
         if ($valor !== $confirmacao) {
-            $this->erros[] = "$campo e confirmação não coincidem";
+            $this->erros[] = [$campo, "$campo e confirmação não coincidem"];
         }
     }
 
@@ -80,28 +80,36 @@ class Validacao
         )->fetch();
 
         if ($emailExiste) {
-            $this->erros[] = "$campo já está em uso";
+            $this->erros[] = [$campo, "$campo já está em uso"];
         }
     }
 
     private function min($campo, $valor, $min)
     {
         if (strlen((string)$valor) < (int)$min) {
-            $this->erros[] = "$campo precisa ter no minimo $min caracteres";
+            $this->erros[] = [$campo, "$campo precisa ter no minimo $min caracteres"];
         }
     }
 
     private function max($campo, $valor, $max)
     {
         if (strlen((string)$valor) > (int)$max) {
-            $this->erros[] = "$campo precisa ter no máximo $max caracteres";
+            $this->erros[] = [$campo, "$campo precisa ter no máximo $max caracteres"];
         }
     }
 
     private function strong($campo, $valor)
     {
         if (! strpbrk($valor, '!@#$%¨&*()_.-[/];|?')) {
-            $this->erros[] = "$campo precisa ter um caracter especial";
+            $this->erros[] = [$campo, "$campo precisa ter um caracter especial"];
+        }
+    }
+
+    public function errosValidacao()
+    {
+        foreach ($this->erros as $erro) {
+            [$campo, $mensagem] = $erro;
+            flash()->setMensagem('error', $campo, $mensagem);
         }
     }
 }

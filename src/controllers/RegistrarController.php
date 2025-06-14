@@ -13,8 +13,9 @@ class RegistrarController extends Controller
                 'senha' => ['required', 'confirmed', 'min:8', 'max:24', 'strong'],
             ], $_POST, $database);
 
-            if (!empty($validacao)) {
-                $_SESSION['errors'] = $validacao;
+            $validacao->errosValidacao();
+
+            if (flash()->hasMensagem('error')) {
                 header('Location: /login');
                 exit;
             }
@@ -28,7 +29,7 @@ class RegistrarController extends Controller
                 ]
             );
 
-            $_SESSION['success'] = ['Usuário registrado com sucesso!'];
+            flash()->setMensagem('success', 'usuario', 'Usuario registrado com sucesso!');
             header('Location: /login');
             exit;
         }
