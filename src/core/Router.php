@@ -7,6 +7,7 @@ $routes = [
     'filme' => 'FilmeController',
     'login' => 'LoginController',
     'registrar' => 'RegistrarController',
+    'meus-filmes' => 'UsuarioFilmesController',
 ];
 
 if(!array_key_exists($path, $routes)) {
