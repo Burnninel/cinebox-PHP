@@ -1,5 +1,4 @@
 <?php
-session_start();
 
 require_once __DIR__ . '/../src/core/Helpers.php';
 require_once __DIR__ . '/../src/core/Database.php';
@@ -11,7 +10,7 @@ spl_autoload_register(function ($class) {
         __DIR__ . '/../src/models/' . $class . '.php',
         __DIR__ . '/../src/services/' . $class . '.php',
     ];
-
+    
     foreach ($paths as $file) {
         if (file_exists($file)) {
             require_once $file;
@@ -19,5 +18,7 @@ spl_autoload_register(function ($class) {
         }
     }
 });
+
+session_start();
 
 require __DIR__ . '/../src/core/Router.php';
