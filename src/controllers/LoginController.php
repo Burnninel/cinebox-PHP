@@ -26,7 +26,7 @@ class LoginController extends Controller
                 params: compact('email')
             )->fetch();
 
-            if (! $usuario->verificarSenha($_POST['senha'])) {
+            if (! $usuario->verificarSenha($senha)) {
                 flash()->setMensagem('error', 'Email ou senha inválidos', 'email');
                 header('Location: /login');
                 exit;
