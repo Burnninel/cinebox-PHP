@@ -4,7 +4,16 @@ class FilmeController extends Controller
 {
     public function index($database)
     {
-        $filmes = $database->query("SELECT * FROM filmes WHERE id = :id", Filme::class, ['id' => $_GET['id']])->fetch();
-        $this->view('filme/index', ['filmes' => $filmes]);
+        $filmeId = $_GET['id'] ?? null;
+
+        $filme = Filme::getFilme($database, $filmeId);
+        
+        if (!$filme) {
+            flash()->setMensagem('error', 'Filme não encontrado', 'filme');
+            header('Location: /filmes');
+            exit;
+        }
+
+        $this->view('filme/index', ['filme' => $filme]);
     }
 }
