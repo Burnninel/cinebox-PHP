@@ -4,8 +4,19 @@ class IndexController extends Controller
 {
     public function index($database)
     {
-        $pesquisa = $_REQUEST['pesquisa'] ?? '';
-        $filmes = $database->query("SELECT * FROM filmes WHERE titulo LIKE :pesquisa", Filme::class, ['pesquisa' => "%$pesquisa%"])->fetchAll();
-        $this->view('index', ['filmes' => $filmes]);
+        $pesquisar = $_REQUEST['pesquisar'] ?? '';
+
+        if (empty($pesquisar)) {
+            flash()->setMensagem('error', 'Por favor, insira um termo de pesquisa.', 'index');
+            $filmes = [];
+        } else {
+            $filmes = Filme::getFilmes($database, $pesquisar);
+
+            if (empty($filmes)) {
+                flash()->setMensagem('error', 'Nenhum filme encontrado para a pesquisa: ' . htmlspecialchars($pesquisar), 'index');
+            }
+        }
+
+        return $this->view('index', ['filmes' => $filmes ?? [], 'pesquisar' => $pesquisar]);
     }
 }
