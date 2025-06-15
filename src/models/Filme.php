@@ -46,9 +46,9 @@ class Filme
             return [];
         }
 
-        $where = 'f.titulo LIKE :pesquisar 
-                  OR f.diretor LIKE :pesquisar 
-                  OR f.categoria LIKE :pesquisar';
+        $where = 'LOWER(f.titulo) LIKE :pesquisar 
+                  OR LOWER(f.diretor) LIKE :pesquisar 
+                  OR LOWER(f.categoria) LIKE :pesquisar';
 
         $params = ['pesquisar' => "%$pesquisar%"];
 
