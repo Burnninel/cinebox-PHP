@@ -35,6 +35,11 @@ class Database
         $prepare->execute($params);
         return $prepare;
     }
+
+    public function lastInsertId()
+    {
+        return $this->db->lastInsertId();
+    }
 }
 
 $database = new Database(config('database'));
