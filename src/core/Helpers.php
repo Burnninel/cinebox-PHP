@@ -12,7 +12,7 @@ function config($chave = null)
 {
     $config = require __DIR__ . '/../../config/config.php';
 
-    if(strlen($chave) > 0) {
+    if (strlen($chave) > 0) {
         return $config[$chave];
     }
 
@@ -31,4 +31,25 @@ function auth()
     }
 
     return $_SESSION['auth'];
+}
+
+function redirectNotPost($url)
+{
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        redirect($url);
+        return;
+    }
+}
+
+function flashRedirect($status, $mensagem, $url, $chave)
+{
+    flash()->setMensagem($status, $mensagem, $chave);
+    header("Location: $url");
+    exit;
+}
+
+function redirect($url)
+{
+    header("Location: $url");
+    exit;
 }

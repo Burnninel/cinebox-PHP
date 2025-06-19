@@ -9,19 +9,13 @@ class FilmeController extends Controller
         $this->filmeService = new FilmeService($database);
     }
 
-    private function redirecionar($url)
-    {
-        header("Location: $url");
-        exit;
-    }
-
     public function index()
     {
         $filmeId = $_GET['id'] ?? null;
         $filme = $filmeId ? $this->filmeService->buscarFilmePorId($filmeId) : null;
 
         if (!$filme) {
-            $this->redirecionarComMensagem('error', 'Filme não encontrado!', '/', 'filme');
+            flashRedirect('error', 'Filme não encontrado!', '/', 'filme');
         }
 
         $this->view('filme/index', ['filme' => $filme]);
@@ -54,19 +48,12 @@ class FilmeController extends Controller
         ];
 
         if (!$this->filmeService->validarDados($dados)) {
-            $this->redirecionar('/filme/novoFilme');
+            redirect('/filme/novoFilme');
         }
 
         $this->filmeService->criarFilme($dados, $usuario_id);
 
-        $this->redirecionarComMensagem('success', 'Filme cadastrado com sucesso!', '/filme/novoFilme', 'filme');
-    }
-
-    private function redirecionarComMensagem($status, $mensagem, $url, $chave)
-    {
-        flash()->setMensagem($status, $mensagem, $chave);
-        header("Location: $url");
-        exit;
+        flashRedirect('success', 'Filme cadastrado com sucesso!', '/filme/novoFilme', 'filme');
     }
 
     private function usuarioAutenticadoOuRedireciona($url)
@@ -74,7 +61,7 @@ class FilmeController extends Controller
         $usuario_id = $this->filmeService->obterUsuarioAutenticado();
 
         if (!$usuario_id) {
-            $this->redirecionarComMensagem('error', 'Usuário não autenticado!', $url, 'filme');
+            flashRedirect('error', 'Usuário não autenticado!', $url, 'filme');
         }
 
         return $usuario_id;
