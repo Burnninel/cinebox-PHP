@@ -9,6 +9,7 @@ spl_autoload_register(function ($class) {
         __DIR__ . '/../src/controllers/' . $class . '.php',
         __DIR__ . '/../src/models/' . $class . '.php',
         __DIR__ . '/../src/services/' . $class . '.php',
+        __DIR__ . '/../src/utils/' . $class . '.php',
     ];
     
     foreach ($paths as $file) {
