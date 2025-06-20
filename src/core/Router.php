@@ -8,6 +8,7 @@ $routes = [
     'filme' => 'FilmeController',
     'login' => 'AuthController',
     'registrar' => 'RegistrarController',
+    'logout' => 'AuthController',
 ];
 
 if(!array_key_exists($rota, $routes)) {

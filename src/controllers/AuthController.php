@@ -58,4 +58,11 @@ class AuthController extends Controller
 
         flashRedirect('success', 'Usuario conectado!', '/', 'usuario');
     }
+
+    public function logout()
+    {
+        redirectNotPost('/login');
+        unset($_SESSION['auth']);
+        flashRedirect('success', 'Usuário desconectado!', '/login', 'usuario');
+    }
 }
