@@ -85,4 +85,18 @@ class FilmeService
 
         return true;
     }
+
+    public function desfavoritarFilme($dados)
+    {
+        if (!isset($dados['usuario_id'], $dados['filme_id']) || !is_numeric($dados['usuario_id']) || !is_numeric($dados['filme_id'])) {
+            return false;
+        }
+
+        $this->database->query(
+            "DELETE FROM usuarios_filmes WHERE usuario_id = :usuario_id AND filme_id = :filme_id",
+            params: $dados
+        );
+
+        return true;
+    }
 }
