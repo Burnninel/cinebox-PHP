@@ -9,6 +9,7 @@ $routes = [
     'login' => 'AuthController',
     'registrar' => 'RegistrarController',
     'logout' => 'AuthController',
+    'avaliacoes' => 'AvaliacaoController',
 ];
 
 if(!array_key_exists($rota, $routes)) {
