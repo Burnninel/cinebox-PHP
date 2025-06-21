@@ -53,3 +53,14 @@ function redirect($url)
     header("Location: $url");
     exit;
 }
+
+function usuarioAutenticadoOuRedireciona($url)
+{
+    $usuario_id = auth()->id;
+
+    if (!$usuario_id) {
+        flashRedirect('error', 'Usuário não autenticado!', $url, 'filme');
+    }
+
+    return $usuario_id;
+}

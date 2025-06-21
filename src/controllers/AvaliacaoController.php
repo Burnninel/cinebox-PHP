@@ -14,7 +14,7 @@ class AvaliacaoController extends Controller
         redirectNotPost('/');
 
         $filme_id = $_GET['id'] ?? null;
-        $usuario_id = $this->usuarioAutenticadoOuRedireciona("/filme?id=$filme_id");
+        $usuario_id = usuarioAutenticadoOuRedireciona("/filme?id=$filme_id");
 
         $dados = [
             'usuario_id' => $usuario_id,
@@ -32,16 +32,5 @@ class AvaliacaoController extends Controller
         }
 
         flashRedirect('success', 'Avaliação criada com sucesso!', "/filme/index?id=$filme_id", 'avaliacao');
-    }
-
-    private function usuarioAutenticadoOuRedireciona($url)
-    {
-        $usuario_id = $this->avaliacaoService->obterUsuarioAutenticado();
-
-        if (!$usuario_id) {
-            flashRedirect('error', 'Usuário não autenticado!', $url, 'filme');
-        }
-
-        return $usuario_id;
     }
 }

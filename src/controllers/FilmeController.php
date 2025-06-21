@@ -23,7 +23,7 @@ class FilmeController extends Controller
 
     public function meusFilmes()
     {
-        $usuario_id = $this->usuarioAutenticadoOuRedireciona('/login');
+        $usuario_id = usuarioAutenticadoOuRedireciona('/login');
 
         $filmes = $this->filmeService->buscarFilmesUsuario($usuario_id);
 
@@ -37,7 +37,7 @@ class FilmeController extends Controller
             return;
         }
 
-        $usuario_id = $this->usuarioAutenticadoOuRedireciona('/filme/novoFilme');
+        $usuario_id = usuarioAutenticadoOuRedireciona('/filme/novoFilme');
 
         $dados = [
             'titulo' => $_POST['titulo'] ?? '',
@@ -61,7 +61,7 @@ class FilmeController extends Controller
         redirectNotPost('/');
         
         $filme_id = $_GET['id'] ?? null;
-        $usuario_id = $this->usuarioAutenticadoOuRedireciona("/filme?id=$filme_id");
+        $usuario_id = usuarioAutenticadoOuRedireciona("/filme?id=$filme_id");
         $dados = [
             'usuario_id' => $usuario_id,
             'filme_id' => $filme_id
@@ -86,7 +86,7 @@ class FilmeController extends Controller
         redirectNotPost('/');
         
         $filme_id = $_GET['id'] ?? null;
-        $usuario_id = $this->usuarioAutenticadoOuRedireciona("/filme?id=$filme_id");
+        $usuario_id = usuarioAutenticadoOuRedireciona("/filme?id=$filme_id");
         $dados = [
             'usuario_id' => $usuario_id,
             'filme_id' => $filme_id
@@ -105,16 +105,4 @@ class FilmeController extends Controller
         $this->filmeService->desfavoritarFilme($dados);
         flashRedirect('success', 'Filme removido dos salvos!', "/filme?id=$filme_id", 'filme');
     }
-
-    private function usuarioAutenticadoOuRedireciona($url)
-    {
-        $usuario_id = $this->filmeService->obterUsuarioAutenticado();
-
-        if (!$usuario_id) {
-            flashRedirect('error', 'Usuário não autenticado!', $url, 'filme');
-        }
-
-        return $usuario_id;
-    }
-   
 }

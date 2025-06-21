@@ -9,12 +9,6 @@ class AvaliacoesService
     {
         $this->database = $database;
     }
-
-    public function obterUsuarioAutenticado()
-    {
-        $usuario_id = auth()->id;
-        return $usuario_id ?: null;
-    }
     
     public function validarDados($dados)
     {
