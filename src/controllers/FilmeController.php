@@ -56,6 +56,31 @@ class FilmeController extends Controller
         flashRedirect('success', 'Filme cadastrado com sucesso!', '/filme/novoFilme', 'filme');
     }
 
+     public function favoritarFilme()
+    {
+        redirectNotPost('/');
+        
+        $filme_id = $_GET['id'] ?? null;
+        $usuario_id = $this->usuarioAutenticadoOuRedireciona("/filme?id=$filme_id");
+        $dados = [
+            'usuario_id' => $usuario_id,
+            'filme_id' => $filme_id
+        ];
+
+        $filme = $filme_id ? $this->filmeService->buscarFilmePorId($filme_id) : null;
+
+        if (!$filme) {
+            flashRedirect('error', 'Erro ao salvar: Filme não encontrado!', '/', 'filme');
+        }
+        
+        if ($this->filmeService->verificarFilmeFavoritado($dados)) {
+            flashRedirect('error', 'Filme já salvo!', "/filme?id=$filme_id", 'filme');
+        }
+
+        $this->filmeService->favoritarFilme($dados);
+        flashRedirect('success', 'Filme salvo com sucesso!', "/filme?id=$filme_id", 'filme');
+    }
+
     private function usuarioAutenticadoOuRedireciona($url)
     {
         $usuario_id = $this->filmeService->obterUsuarioAutenticado();
@@ -66,4 +91,5 @@ class FilmeController extends Controller
 
         return $usuario_id;
     }
+   
 }

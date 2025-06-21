@@ -61,4 +61,28 @@ class FilmeService
 
         return $idFilme;
     }
+
+    public function verificarFilmeFavoritado($dados)
+    {
+        $salvos = $this->database->query(
+            "SELECT * FROM usuarios_filmes WHERE usuario_id = :usuario_id AND filme_id = :filme_id",
+            params: $dados
+        )->fetch();
+
+        return !empty($salvos);
+    }
+
+    public function favoritarFilme($dados)
+    {
+        if (!isset($dados['usuario_id'], $dados['filme_id']) || !is_numeric($dados['usuario_id']) || !is_numeric($dados['filme_id'])) {
+            return false;
+        }
+
+        $this->database->query(
+            "INSERT INTO usuarios_filmes (usuario_id, filme_id) VALUES (:usuario_id, :filme_id)",
+            params: $dados
+        );
+
+        return true;
+    }
 }
