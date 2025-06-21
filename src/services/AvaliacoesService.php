@@ -4,6 +4,7 @@ class AvaliacoesService
 {
     protected $database;
     protected $validacao;
+    protected $avaliacao;
 
     public function __construct($database)
     {
@@ -28,12 +29,19 @@ class AvaliacoesService
             return false;
         }
 
-        $this->database->query(
-            "INSERT INTO avaliacoes (usuario_id, filme_id, nota, comentario)
-             VALUES (:usuario_id, :filme_id, :nota, :comentario)",
-            params: $dados
-        );
+        $this->avaliacao = Avaliacao::criarAvaliacao($this->database, $dados);
 
         return true;
+    }
+
+    public function listarAvaliacoes($filme_id)
+    {
+        if (!isset($filme_id) || !is_numeric($filme_id)) {
+            return false;
+        }
+
+        $this->avaliacao = Avaliacao::buscarAvaliacoesFilme($this->database, $filme_id);
+
+        return $this->avaliacao;
     }
 }
