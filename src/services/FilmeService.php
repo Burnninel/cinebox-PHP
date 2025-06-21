@@ -10,12 +10,6 @@ class FilmeService
         $this->database = $database;
     }
 
-    public function obterUsuarioAutenticado()
-    {
-        $usuario_id = auth()->id;
-        return $usuario_id ?: null;
-    }
-
     public function buscarFilmePorId($id)
     {
         return Filme::getFilme($this->database, $id);
