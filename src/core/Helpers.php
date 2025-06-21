@@ -64,3 +64,12 @@ function usuarioAutenticadoOuRedireciona($url)
 
     return $usuario_id;
 }
+
+function validarIdOuRedirecionar($paramName, $redirectUrl, $mensagemErro = 'ID inválido!', $item = 'usuario')
+{
+    if (!isset($_GET[$paramName]) || !is_numeric($_GET[$paramName])) {
+        flashRedirect('error', $mensagemErro, $redirectUrl, $item);
+    }
+
+    return (int) $_GET[$paramName];
+}

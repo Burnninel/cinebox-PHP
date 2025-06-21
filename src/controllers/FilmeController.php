@@ -11,8 +11,8 @@ class FilmeController extends Controller
 
     public function index()
     {
-        $filmeId = $_GET['id'] ?? null;
-        $filme = $filmeId ? $this->filmeService->buscarFilmePorId($filmeId) : null;
+        $filme_id = validarIdOuRedirecionar('id', '/', 'Filme não encontrado!');
+        $filme = $filme_id ? $this->filmeService->buscarFilmePorId($filme_id) : null;
 
         if (!$filme) {
             flashRedirect('error', 'Filme não encontrado!', '/', 'filme');

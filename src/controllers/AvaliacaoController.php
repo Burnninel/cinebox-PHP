@@ -13,7 +13,7 @@ class AvaliacaoController extends Controller
     {
         redirectNotPost('/');
 
-        $filme_id = $_GET['id'] ?? null;
+        $filme_id = validarIdOuRedirecionar('id', '/', 'Filme não encontrado!');
         $usuario_id = usuarioAutenticadoOuRedireciona("/filme?id=$filme_id");
 
         $dados = [

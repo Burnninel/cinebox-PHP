@@ -43,17 +43,17 @@ class FilmeService
             params: $dados
         );
 
-        $idFilme = $this->database->lastInsertId();
+        $filme_id = $this->database->lastInsertId();
 
         $this->database->query(
             "INSERT INTO usuarios_filmes (usuario_id, filme_id) VALUES (:usuario_id, :filme_id)",
             params: [
                 'usuario_id' => $usuario_id,
-                'filme_id' => $idFilme
+                'filme_id' => $filme_id
             ]
         );
 
-        return $idFilme;
+        return $filme_id;
     }
 
     public function verificarFilmeFavoritado($dados)
