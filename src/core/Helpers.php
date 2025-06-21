@@ -41,9 +41,9 @@ function redirectNotPost($url)
     }
 }
 
-function flashRedirect($status, $mensagem, $url, $chave)
+function flashRedirect($status, $mensagem, $url)
 {
-    flash()->setMensagem($status, $mensagem, $chave);
+    flash()->setMensagem($status, $mensagem);
     header("Location: $url");
     exit;
 }

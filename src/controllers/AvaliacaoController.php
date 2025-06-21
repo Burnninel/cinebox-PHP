@@ -28,9 +28,9 @@ class AvaliacaoController extends Controller
         }
 
         if (!$this->avaliacaoService->criarAvaliacao($dados)) {
-            flashRedirect('error', 'Erro ao salvar avaliação!', "/filme/index?id=$filme_id", 'avaliacao');
+            flashRedirect('error', 'Erro ao salvar avaliação!', "/filme/index?id=$filme_id");
         }
 
-        flashRedirect('success', 'Avaliação criada com sucesso!', "/filme/index?id=$filme_id", 'avaliacao');
+        flashRedirect('success', 'Avaliação criada com sucesso!', "/filme/index?id=$filme_id");
     }
 }

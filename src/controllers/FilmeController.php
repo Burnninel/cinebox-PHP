@@ -15,7 +15,7 @@ class FilmeController extends Controller
         $filme = $filme_id ? $this->filmeService->buscarFilmePorId($filme_id) : null;
 
         if (!$filme) {
-            flashRedirect('error', 'Filme não encontrado!', '/', 'filme');
+            flashRedirect('error', 'Filme não encontrado!', '/');
         }
 
         $this->view('filme/index', ['filme' => $filme]);
@@ -53,7 +53,7 @@ class FilmeController extends Controller
 
         $this->filmeService->criarFilme($dados, $usuario_id);
 
-        flashRedirect('success', 'Filme cadastrado com sucesso!', '/filme/novoFilme', 'filme');
+        flashRedirect('success', 'Filme cadastrado com sucesso!', '/filme/novoFilme');
     }
 
      public function favoritarFilme()
@@ -70,15 +70,15 @@ class FilmeController extends Controller
         $filme = $filme_id ? $this->filmeService->buscarFilmePorId($filme_id) : null;
 
         if (!$filme) {
-            flashRedirect('error', 'Erro ao salvar: Filme não encontrado!', '/', 'filme');
+            flashRedirect('error', 'Erro ao salvar: Filme não encontrado!', '/');
         }
         
         if ($this->filmeService->verificarFilmeFavoritado($dados)) {
-            flashRedirect('error', 'Filme já salvo!', "/filme?id=$filme_id", 'filme');
+            flashRedirect('error', 'Filme já salvo!', "/filme?id=$filme_id");
         }
 
         $this->filmeService->favoritarFilme($dados);
-        flashRedirect('success', 'Filme salvo com sucesso!', "/filme?id=$filme_id", 'filme');
+        flashRedirect('success', 'Filme salvo com sucesso!', "/filme?id=$filme_id");
     }
 
      public function desfavoritarFilme()
@@ -95,14 +95,14 @@ class FilmeController extends Controller
         $filme = $filme_id ? $this->filmeService->buscarFilmePorId($filme_id) : null;
 
         if (!$filme) {
-            flashRedirect('error', 'Erro ao salvar: Filme não encontrado!', '/', 'filme');
+            flashRedirect('error', 'Erro ao salvar: Filme não encontrado!', '/');
         }
         
         if (!$this->filmeService->verificarFilmeFavoritado($dados)) {
-            flashRedirect('error', 'Filme não está favoritado!', "/filme?id=$filme_id", 'filme');
+            flashRedirect('error', 'Filme não está favoritado!', "/filme?id=$filme_id");
         }
 
         $this->filmeService->desfavoritarFilme($dados);
-        flashRedirect('success', 'Filme removido dos salvos!', "/filme?id=$filme_id", 'filme');
+        flashRedirect('success', 'Filme removido dos salvos!', "/filme?id=$filme_id");
     }
 }

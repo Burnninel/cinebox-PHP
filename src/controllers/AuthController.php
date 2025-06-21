@@ -31,7 +31,7 @@ class AuthController extends Controller
 
         $this->authService->registrar($dados);
 
-        flash()->setMensagem('success', 'Usuário registrado com sucesso!', 'usuario');
+        flash()->setMensagem('success', 'Usuário registrado com sucesso!');
         redirect('/login');
     }
 
@@ -51,18 +51,18 @@ class AuthController extends Controller
         $usuario = $this->authService->autenticar($dados['email'], $dados['senha']);
 
         if (!$usuario) {
-            flashRedirect('error', 'Email ou senha inválidos.', '/login', 'usuario');
+            flashRedirect('error', 'Email ou senha inválidos.', '/login');
         }
 
         $_SESSION['auth'] = $usuario;
 
-        flashRedirect('success', 'Usuario conectado!', '/', 'usuario');
+        flashRedirect('success', 'Usuario conectado!', '/');
     }
 
     public function logout()
     {
         redirectNotPost('/login');
         unset($_SESSION['auth']);
-        flashRedirect('success', 'Usuário desconectado!', '/login', 'usuario');
+        flashRedirect('success', 'Usuário desconectado!', '/login');
     }
 }
