@@ -12,7 +12,7 @@ class FilmeService
 
     public function buscarFilmePorId($id)
     {
-        return Filme::getFilme($this->database, $id);
+        return Filme::getFilmePorId($this->database, $id);
     }
 
     public function buscarFilmesUsuario($usuario_id)
@@ -37,31 +37,12 @@ class FilmeService
 
     public function criarFilme($dados, $usuario_id)
     {
-        $this->database->query(
-            "INSERT INTO filmes (titulo, diretor, ano_de_lancamento, sinopse, categoria)
-             VALUES (:titulo, :diretor, :ano_de_lancamento, :sinopse, :categoria)",
-            params: $dados
-        );
-
-        $filme_id = $this->database->lastInsertId();
-
-        $this->database->query(
-            "INSERT INTO usuarios_filmes (usuario_id, filme_id) VALUES (:usuario_id, :filme_id)",
-            params: [
-                'usuario_id' => $usuario_id,
-                'filme_id' => $filme_id
-            ]
-        );
-
-        return $filme_id;
+        return Filme::incluirNovoFilme($this->database, $dados, $usuario_id);
     }
 
     public function verificarFilmeFavoritado($dados)
     {
-        $salvos = $this->database->query(
-            "SELECT * FROM usuarios_filmes WHERE usuario_id = :usuario_id AND filme_id = :filme_id",
-            params: $dados
-        )->fetch();
+        $salvos = Filme::verificarFavoritado($this->database, $dados);
 
         return !empty($salvos);
     }
@@ -72,10 +53,7 @@ class FilmeService
             return false;
         }
 
-        $this->database->query(
-            "INSERT INTO usuarios_filmes (usuario_id, filme_id) VALUES (:usuario_id, :filme_id)",
-            params: $dados
-        );
+        Filme::favoritar($this->database, $dados);
 
         return true;
     }
@@ -86,10 +64,7 @@ class FilmeService
             return false;
         }
 
-        $this->database->query(
-            "DELETE FROM usuarios_filmes WHERE usuario_id = :usuario_id AND filme_id = :filme_id",
-            params: $dados
-        );
+        Filme::desfavoritar($this->database, $dados);
 
         return true;
     }

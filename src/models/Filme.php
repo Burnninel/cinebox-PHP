@@ -31,7 +31,7 @@ class Filme
         );
     }
 
-    public static function getFilme($database, $id)
+    public static function getFilmePorId($database, $id)
     {
         return (new self)->query(
             $database,
@@ -66,5 +66,50 @@ class Filme
         $params = ['usuario_id' => $usuarioId];
 
         return (new self)->query($database, $where, $params)->fetchAll();
+    }
+
+    public static function incluirNovoFilme($database, $dados, $usuario_id)
+    {
+        $database->query(
+            "INSERT INTO filmes (titulo, diretor, ano_de_lancamento, sinopse, categoria)
+             VALUES (:titulo, :diretor, :ano_de_lancamento, :sinopse, :categoria)",
+            params: $dados
+        );
+
+        $filme_id = $database->lastInsertId();
+
+        $database->query(
+            "INSERT INTO usuarios_filmes (usuario_id, filme_id) VALUES (:usuario_id, :filme_id)",
+            params: [
+                'usuario_id' => $usuario_id,
+                'filme_id' => $filme_id
+            ]
+        );
+
+        return $filme_id;
+    }
+
+    public static function verificarFavoritado($database, $dados)
+    {
+        return $database->query(
+            "SELECT * FROM usuarios_filmes WHERE usuario_id = :usuario_id AND filme_id = :filme_id",
+            params: $dados
+        )->fetch();
+    }
+
+    public static function favoritar($database, $dados)
+    {
+        return $database->query(
+            "INSERT INTO usuarios_filmes (usuario_id, filme_id) VALUES (:usuario_id, :filme_id)",
+            params: $dados
+        );
+    }
+
+    public static function desfavoritar($database, $dados)
+    {
+        return $database->query(
+            "DELETE FROM usuarios_filmes WHERE usuario_id = :usuario_id AND filme_id = :filme_id",
+            params: $dados
+        );
     }
 }

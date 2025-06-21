@@ -3,10 +3,12 @@
 class FilmeController extends Controller
 {
     private $filmeService;
+    private $avaliacaoService;
 
     public function __construct($database)
     {
         $this->filmeService = new FilmeService($database);
+        $this->avaliacaoService = new AvaliacoesService($database);
     }
 
     public function index()
@@ -17,8 +19,12 @@ class FilmeController extends Controller
         if (!$filme) {
             flashRedirect('error', 'Filme não encontrado!', '/');
         }
+         $avaliacoes = $this->avaliacaoService->listarAvaliacoes($filme_id);
 
-        $this->view('filme/index', ['filme' => $filme]);
+        $this->view('filme/index', [
+            'filme' => $filme,
+            'avaliacoes' => $avaliacoes
+        ]);
     }
 
     public function meusFilmes()
