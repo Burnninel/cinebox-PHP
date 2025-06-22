@@ -105,6 +105,13 @@ class Validacao
         }
     }
 
+    private function numeric($campo, $valor)
+    {
+        if (!is_numeric($valor)) {
+            $this->erros[] = [$campo, "O campo $campo precisa ser númerico"];
+        }
+    }
+
     public function errosValidacao()
     {
         foreach ($this->erros as $erro) {

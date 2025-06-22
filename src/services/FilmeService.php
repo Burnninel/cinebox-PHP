@@ -27,7 +27,7 @@ class FilmeService
             'diretor' => ['required', 'min:6'],
             'categoria' => ['required'],
             'sinopse' => ['required'],
-            'ano_de_lancamento' => ['required', 'max:4', 'min:4'],
+            'ano_de_lancamento' => ['required', 'numeric', 'max:4', 'min:4'],
         ], $dados, $this->database);
 
         $this->validacao->errosValidacao();

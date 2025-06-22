@@ -14,7 +14,7 @@ class AvaliacoesService
     public function validarDados($dados)
     {
         $this->validacao = Validacao::validarCampos([
-            'nota' => ['required'],
+            'nota' => ['required', 'numeric', 'min:1', 'max:1'],
             'comentario' => ['required', 'min:15'],
         ], $dados, $this->database);
 
