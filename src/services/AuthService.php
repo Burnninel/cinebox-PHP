@@ -37,11 +37,7 @@ class AuthService
 
     public function autenticar($email, $senha)
     {
-        $usuario = $this->database->query(
-            query: "SELECT * FROM usuarios WHERE email = :email",
-            class: Usuario::class,
-            params: compact('email')
-        )->fetch();
+        $usuario = Usuario::buscarUsuarioCredenciais($this->database, $email);
 
         return $usuario && $usuario->verificarSenha($senha) ? $usuario : null;
     }
@@ -51,12 +47,9 @@ class AuthService
         $dadosFiltrados = [
             'nome' => $dados['nome'],
             'email' => $dados['email'],
-            'senha' => password_hash($dados['senha'], PASSWORD_BCRYPT)
+            'senha' => Usuario::hashSenha($dados['senha'])
         ];
 
-        $this->database->query(
-            "INSERT INTO usuarios (nome, email, senha) VALUES (:nome, :email, :senha)",
-            params: $dadosFiltrados
-        );
+        return Usuario::cadastrarUsuario($this->database, $dadosFiltrados);
     }
 }
