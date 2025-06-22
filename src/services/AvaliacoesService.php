@@ -44,4 +44,14 @@ class AvaliacoesService
 
         return $this->avaliacao;
     }
+
+    public function buscarAvaliacaoPorId($id)
+    {
+        return Avaliacao::buscarAvaliacao($this->database, $id);
+    }
+
+    public function excluirAvaliacao($dados)
+    {
+        return Avaliacao::removerAvaliacao($this->database, $dados);
+    }
 }
