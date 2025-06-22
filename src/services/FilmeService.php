@@ -24,9 +24,9 @@ class FilmeService
     {
         $this->validacao = Validacao::validarCampos([
             'titulo' => ['required', 'min:3', 'unique:filmes'],
-            'diretor' => ['required', 'min:6'],
-            'categoria' => ['required'],
-            'sinopse' => ['required'],
+            'diretor' => ['required', 'min:6', 'string'],
+            'categoria' => ['required', 'string'],
+            'sinopse' => ['required', 'string'],
             'ano_de_lancamento' => ['required', 'numeric', 'max:4', 'min:4'],
         ], $dados, $this->database);
 

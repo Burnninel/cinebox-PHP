@@ -25,7 +25,7 @@ class AuthService
     public function validarRegistro($dados)
     {
         $this->validacao = Validacao::validarCampos([
-            'nome' => ['required'],
+            'nome' => ['required', 'string'],
             'email' => ['required', 'email', 'unique:usuarios'],
             'senha' => ['required', 'confirmed', 'min:8', 'max:24', 'strong'],
         ], $dados, $this->database);

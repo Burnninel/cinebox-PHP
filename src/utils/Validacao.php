@@ -105,6 +105,13 @@ class Validacao
         }
     }
 
+    private function string($campo, $valor)
+    {
+        if (!preg_match('/^[a-zA-ZÀ-ú0-9\s\/\-.!?]+$/u', $valor)) {
+            $this->erros[] = [$campo, "Caracteres inválidos para o campo $campo"];
+        }
+    }
+
     private function numeric($campo, $valor)
     {
         if (!is_numeric($valor)) {
