@@ -120,12 +120,11 @@ class FilmeController extends Controller
         $usuario_id = usuarioAutenticadoOuRedireciona("/filme?id=$avaliacao_id");
 
         $avaliacao = $this->avaliacaoService->buscarAvaliacaoPorId($avaliacao_id);
+        $filme_id = $avaliacao['filme_id'];
 
         if (!$avaliacao || $avaliacao['usuario_id'] !== $usuario_id) {
-            flashRedirect('error', 'Avaliação não encontrada ou não pertence a você.', '/');
+            flashRedirect('error', 'Não é possivel excluir está avaliação.', "/filme?id=$filme_id");
         }
-
-        $filme_id = $avaliacao['filme_id'];
 
         $dados = [
             'id' => $avaliacao_id,
