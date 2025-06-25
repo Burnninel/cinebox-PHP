@@ -65,11 +65,22 @@ function usuarioAutenticadoOuRedireciona($url)
     return $usuario_id;
 }
 
-function validarIdOuRedirecionar($paramName, $redirectUrl, $mensagemErro = 'ID inválido!', $item = 'usuario')
+function usuarioAutenticadoOuJson401()
 {
-    if (!isset($_GET[$paramName]) || !is_numeric($_GET[$paramName])) {
-        flashRedirect('error', $mensagemErro, $redirectUrl, $item);
+    $usuario = auth();
+
+    if (!isset($usuario->id)) {
+        http_response_code(401);
+        echo json_encode(['error' => 'Usuário não autenticado.']);
+        exit;
     }
 
-    return (int) $_GET[$paramName];
+    return $usuario;
+}
+
+function jsonResponse($dados, $status = 200) 
+{
+    http_response_code($status);
+    echo json_encode($dados);
+    exit;
 }
