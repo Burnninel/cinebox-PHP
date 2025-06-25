@@ -15,7 +15,7 @@ class Validacao
         $validacaoBanco = [];
 
         foreach ($regrasValidacao as $campo => $regrasCampo) {
-            $valor = $camposForm[$campo] ?? null;
+            $valor = array_key_exists($campo, $camposForm) ? $camposForm[$campo] : null;
             $confirmacao = $camposForm["confirmar_$campo"] ?? null;
 
             foreach ($regrasCampo as $regra) {
@@ -107,7 +107,7 @@ class Validacao
 
     private function string($campo, $valor)
     {
-        if (!preg_match('/^[a-zA-ZÀ-ú0-9\s\/\-.!?]+$/u', $valor)) {
+        if (!$valor || !preg_match('/^[a-zA-ZÀ-ÿ\s\.-]+$/u', $valor)) {
             $this->erros[] = [$campo, "Caracteres inválidos para o campo $campo"];
         }
     }
@@ -119,11 +119,18 @@ class Validacao
         }
     }
 
-    public function errosValidacao()
+    public function erros()
     {
+        $resultado = [];
+
         foreach ($this->erros as $erro) {
             [$campo, $mensagem] = $erro;
-            flash()->setMensagem('error', $mensagem, $campo,);
+
+            if (!isset($resultado[$campo])) {
+                $resultado[$campo] = $mensagem;
+            }
         }
+
+        return $resultado;
     }
 }
