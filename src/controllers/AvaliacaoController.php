@@ -9,28 +9,62 @@ class AvaliacaoController extends Controller
         $this->avaliacaoService = new AvaliacoesService($database);
     }
 
-    public function criarAvaliacao()
+    public function store($id)
     {
-        redirectNotPost('/');
+        $dados = json_decode(file_get_contents('php://input'), true) ?: [];
 
-        $filme_id = validarIdOuRedirecionar('id', '/', 'Filme não encontrado!');
-        $usuario_id = usuarioAutenticadoOuRedireciona("/filme?id=$filme_id");
+        $usuario = usuarioAutenticadoOuJson401();
+
+        $erros = $this->avaliacaoService->validarDados($dados);
+
+        if (!empty($erros)) {
+            jsonResponse(['success' => false, "message" => "Dados inválidos!", "errors" => $erros], 400);
+        }
+
+        $filme = $this->avaliacaoService->buscarFilmePorId($id);
+
+        if (!$filme) {
+            jsonResponse(['success' => false, "message" => "Filme não encontrado!"], 400);
+        }
+
+        $avaliado = ($this->avaliacaoService->buscarAvaliacaoUsuarioFilme($id, $usuario->id));
+
+        if (!empty($avaliado)) {
+            jsonResponse(['success' => false, "message" => "Filme já avaliado!"], 400);
+        }
+
+        $avaliacao = $this->avaliacaoService->criarAvaliacao($dados, $id, $usuario->id);
+
+        if (!$avaliacao) {
+            jsonResponse(['success' => false, "message" => "Erro ao salvar avaliação!"], 400);
+        }
+
+        jsonResponse(['success' => true, "message" => "Filme avaliado com sucesso!"]);
+    }
+
+    public function destroy($id)
+    {
+        $usuario = usuarioAutenticadoOuJson401();
 
         $dados = [
-            'usuario_id' => $usuario_id,
-            'filme_id' => $filme_id,
-            'nota' => $_POST['nota'] ?? '',
-            'comentario' => $_POST['comentario'] ?? '',
+            'id' => $id,
+            'usuario_id' => $usuario->id
         ];
 
-        if (!$this->avaliacaoService->validarDados($dados)) {
-            redirect("/filme/index?id=$filme_id");
+        $avaliacao = $this->avaliacaoService->buscarAvaliacaoPorId($id);
+
+        if (!$avaliacao) {
+            jsonResponse(['success' => false, 'message' => 'Avaliação não encontrada.'], 400);
         }
 
-        if (!$this->avaliacaoService->criarAvaliacao($dados)) {
-            flashRedirect('error', 'Erro ao salvar avaliação!', "/filme/index?id=$filme_id");
+        if ($avaliacao['usuario_id'] !== $usuario->id) {
+            jsonResponse(['success' => false, 'message' => 'Você não tem permissão para excluir esta avaliação.'], 403);
         }
 
-        flashRedirect('success', 'Avaliação criada com sucesso!', "/filme/index?id=$filme_id");
+        if (!$this->avaliacaoService->excluirAvaliacao($dados)) {
+            jsonResponse(['success' => false, "message" => "Erro ao excluir avaliação!"], 400);
+        }
+
+        jsonResponse(['success' => true, "message" => "Avaliação removida com sucesso!"]);
     }
 }

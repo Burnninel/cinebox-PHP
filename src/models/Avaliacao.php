@@ -9,25 +9,48 @@ class Avaliacao
     public $comentario;
     public $nota;
 
-    public static function buscarAvaliacoesFilme($database, $id)
+    public static function queryFilmeAvaliacao($database, $where, $params = [])
     {
+        $sql = "
+            SELECT 
+                f.id as filme_id,
+                u.id as usuario_id,
+                u.nome AS usuario,
+                a.id,
+                a.comentario,
+                a.nota
+            FROM avaliacoes AS a
+            LEFT JOIN usuarios AS u ON u.id = a.usuario_id
+            LEFT JOIN filmes AS f ON f.id = a.filme_id
+        ";
+
+        if ($where) {
+            $sql .= " WHERE $where";
+        }
+
         return $database->query(
-            query: "
-                SELECT 
-                    f.id as filme_id,
-                    u.id as usuario_id,
-                    u.nome AS usuario,
-                    a.id,
-                    a.comentario,
-                    a.nota
-                FROM avaliacoes AS a
-                LEFT JOIN usuarios AS u ON u.id = a.usuario_id
-                LEFT JOIN filmes AS f ON f.id = a.filme_id
-                WHERE f.id = :filme_id
-            ",
+            query: $sql,
             class: self::class,
-            params: ['filme_id' => $id]
+            params: $params
+        );
+    }
+
+    public static function buscarAvaliacoesFilme($database, $filme_id) {
+         return self::queryFilmeAvaliacao(
+            $database,
+            where: 'f.id = :filme_id',
+            params: ['filme_id' => $filme_id]
         )->fetchAll();
+    }
+
+    public static function buscarAvaliacaoUsuarioFilme($database, $filme_id, $usuario_id) {
+         $avaliacao = self::queryFilmeAvaliacao(
+            $database,
+            where: 'a.filme_id = :filme_id AND a.usuario_id = :usuario_id',
+            params: ['filme_id' => $filme_id, 'usuario_id' => $usuario_id]
+        )->fetch();
+
+        return $avaliacao ?: null;
     }
 
     public static function criarAvaliacao($database, $dados)

@@ -10,43 +10,57 @@ class AvaliacoesService
     {
         $this->database = $database;
     }
-    
+
+    private function idInvalido($id)
+    {
+        return !isset($id) || !is_numeric($id);
+    }
+
+    public function buscarFilmePorId($id)
+    {
+        if ($this->idInvalido($id)) return false;
+        return Filme::getFilmePorId($this->database, $id);
+    }
+
     public function validarDados($dados)
     {
-        $this->validacao = Validacao::validarCampos([
+        $regras = [
             'nota' => ['required', 'numeric', 'min:1', 'max:1'],
-            'comentario' => ['required', 'min:15'],
-        ], $dados, $this->database);
+            'comentario' => ['required', 'min:15']
+        ];
 
-        $this->validacao->errosValidacao();
+        $validador = Validacao::validarCampos($regras, $dados, $this->database);
 
-        return !flash()->hasMensagem('error');
+        return $validador->erros();
     }
 
-    public function criarAvaliacao($dados)
+    public function criarAvaliacao($dados, $id, $usuario)
     {
-        if (!isset($dados['usuario_id'], $dados['filme_id']) || !is_numeric($dados['usuario_id']) || !is_numeric($dados['filme_id'])) {
-            return false;
-        }
+        if ($this->idInvalido($id)) return false;
 
-        $this->avaliacao = Avaliacao::criarAvaliacao($this->database, $dados);
+        $dados += [
+            'filme_id' => $id,
+            'usuario_id' => $usuario
+        ];
 
-        return true;
+        return Avaliacao::criarAvaliacao($this->database, $dados);
     }
 
-    public function listarAvaliacoes($filme_id)
+    public function listarAvaliacoes($id)
     {
-        if (!isset($filme_id) || !is_numeric($filme_id)) {
-            return false;
-        }
+        if ($this->idInvalido($id)) return false;
+        return Avaliacao::buscarAvaliacoesFilme($this->database, $id);
+    }
 
-        $this->avaliacao = Avaliacao::buscarAvaliacoesFilme($this->database, $filme_id);
-
-        return $this->avaliacao;
+    public function buscarAvaliacaoUsuarioFilme($id, $usuario)
+    {
+        if ($this->idInvalido($id)) return false;
+        return Avaliacao::buscarAvaliacaoUsuarioFilme($this->database, $id, $usuario);
     }
 
     public function buscarAvaliacaoPorId($id)
     {
+        if ($this->idInvalido($id)) return false;
         return Avaliacao::buscarAvaliacao($this->database, $id);
     }
 
