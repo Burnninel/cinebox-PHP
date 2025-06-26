@@ -9,60 +9,61 @@ class AuthController extends Controller
         $this->authService = new AuthService($database);
     }
 
-    public function index()
+    public function store()
     {
-        $this->view('login/index');
-    }
+        $dados = json_decode(file_get_contents('php://input'), true) ?: [];
 
-    public function registrar()
-    {
-        redirectNotPost('/login');
-
-        $dados = [
-            'nome' => $_POST['nome'],
-            'email' => $_POST['email'],
-            'senha' => $_POST['senha'],
-            'confirmar_senha' => $_POST['confirmar_senha'] ?? ''
-        ];
-
-        if (!$this->authService->validarRegistro($dados)) {
-            redirect('/login');
+        if (empty($dados)) {
+            jsonResponse(['status' => false, 'message' => 'Requisição inválida: nenhum dado foi enviado.'], 400);
         }
 
-        $this->authService->registrar($dados);
+        $erros = $this->authService->validarRegistro($dados);
 
-        flash()->setMensagem('success', 'Usuário registrado com sucesso!');
-        redirect('/login');
+        if (!empty($erros)) {
+            jsonResponse(['status' => false, 'message' => 'Dados inválidos!', 'errors' => $erros], 400);
+        }
+
+        $usuario = $this->authService->registrar($dados);
+
+        if (!$usuario) {
+            jsonResponse(['status' => true, 'message' => 'Não foi possivel registrar o usuario.'], 422);
+        }
+
+        jsonResponse(['status' => true, 'message' => 'Usuário cadastrado com sucesso!']);
     }
 
-    public function autenticar()
+    public function login()
     {
-        redirectNotPost('/login');
+        $dados = json_decode(file_get_contents('php://input'), true);
 
-        $dados = [
-            'email' => $_POST['email'],
-            'senha' => $_POST['senha']
-        ];
+        if (empty($dados)) {
+            jsonResponse(['status' => false, 'message' => 'Requisição inválida: nenhum dado foi enviado.'], 400);
+        }
 
-        if (!$this->authService->validarLogin($dados)) {
-            redirect('/login');
+        $erros = $this->authService->validarLogin($dados);
+
+        if (!empty($erros)) {
+            jsonResponse(['status' => false, 'message' => 'Erro ao realizar login.', 'errors' => $erros], 400);
         }
 
         $usuario = $this->authService->autenticar($dados['email'], $dados['senha']);
 
         if (!$usuario) {
-            flashRedirect('error', 'Email ou senha inválidos.', '/login');
+            jsonResponse(['status' => false, 'message' => 'Email ou senha incorretos.'], 401);
         }
 
-        $_SESSION['auth'] = $usuario;
+        $_SESSION['auth'] = [
+            'id' => $usuario->id,
+            'nome' => $usuario->nome,
+            'email' => $usuario->email
+        ];
 
-        flashRedirect('success', 'Usuario conectado!', '/');
+        jsonResponse(['status' => true, 'message' => 'Usuário autenticado com sucesso.', 'usuario' => $usuario]);
     }
 
     public function logout()
     {
-        redirectNotPost('/login');
         unset($_SESSION['auth']);
-        flashRedirect('success', 'Usuário desconectado!', '/login');
+        jsonResponse(['status' => true, 'message' => 'Usuário desconectado com sucesso.']);
     }
 }

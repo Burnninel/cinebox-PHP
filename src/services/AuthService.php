@@ -12,42 +12,40 @@ class AuthService
 
     public function validarLogin($dados)
     {
-        $this->validacao = Validacao::validarCampos([
+        $regras = [
             'email' => ['required', 'email'],
-            'senha' => ['required']
-        ], $dados, $this->database);
+            'senha' => ['required'],
+        ];
 
-        $this->validacao->errosValidacao();
+        $validador = Validacao::validarCampos($regras, $dados, $this->database);
 
-        return !flash()->hasMensagem('error');
+        return $validador->erros();
     }
 
     public function validarRegistro($dados)
     {
-        $this->validacao = Validacao::validarCampos([
-            'nome' => ['required', 'string'],
+        $regras = [
+            'nome' => ['required', 'string', 'min:5'],
             'email' => ['required', 'email', 'unique:usuarios'],
-            'senha' => ['required', 'confirmed', 'min:8', 'max:24', 'strong'],
-        ], $dados, $this->database);
+            'senha' => ['required', 'min:8', 'max:24', 'strong', 'confirmed'],
+        ];
 
-        $this->validacao->errosValidacao();
-
-        return !flash()->hasMensagem('error');
+        $validador = Validacao::validarCampos($regras, $dados, $this->database);
+        return $validador->erros();
     }
 
     public function autenticar($email, $senha)
     {
         $usuario = Usuario::buscarUsuarioCredenciais($this->database, $email);
-
         return $usuario && $usuario->verificarSenha($senha) ? $usuario : null;
     }
 
     public function registrar($dados)
     {
         $dadosFiltrados = [
-            'nome' => $dados['nome'],
-            'email' => $dados['email'],
-            'senha' => Usuario::hashSenha($dados['senha'])
+            'nome' => $dados['nome'] ?? '',
+            'email' => $dados['email'] ?? '',
+            'senha' => Usuario::hashSenha($dados['senha'] ?? '')
         ];
 
         return Usuario::cadastrarUsuario($this->database, $dadosFiltrados);
