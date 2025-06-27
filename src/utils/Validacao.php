@@ -100,7 +100,7 @@ class Validacao
 
     private function strong($campo, $valor)
     {
-        if (! strpbrk($valor, '!@#$%¨&*()_.-[/];|?')) {
+        if (!$valor || !strpbrk($valor, '!@#$%¨&*()_.-[/];|?')) {
             $this->erros[] = [$campo, "$campo precisa ter um caracter especial"];
         }
     }
