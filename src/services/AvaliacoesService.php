@@ -25,7 +25,7 @@ class AvaliacoesService
     public function validarDados($dados)
     {
         $regras = [
-            'nota' => ['required', 'numeric', 'min:1', 'max:1'],
+            'nota' => ['required', 'numeric', 'between:1-5', 'length:1'],
             'comentario' => ['required', 'min:15']
         ];
 

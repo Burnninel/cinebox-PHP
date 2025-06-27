@@ -32,7 +32,9 @@ class FilmeService
             'diretor' => ['required', 'min:6', 'string'],
             'categoria' => ['required', 'string'],
             'sinopse' => ['required', 'string'],
-            'ano_de_lancamento' => ['required', 'numeric', 'max:4', 'min:4']
+            'ano_de_lancamento' => [
+                'required', 'numeric', 'max:4', 'min:4', 'between:1900-2025', 'length:4'
+            ]
         ];
 
         $validador = $this->validacao = Validacao::validarCampos($regras, $dados, $this->database);
