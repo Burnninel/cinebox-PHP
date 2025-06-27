@@ -10,6 +10,11 @@ class FilmeService
         $this->database = $database;
     }
 
+    public function buscarFilmes($pesquisar)
+    {
+        return Filme::getFilmes($this->database, $pesquisar);
+    }
+
     public function buscarFilmePorId($id)
     {
         return Filme::getFilmePorId($this->database, $id);
@@ -20,19 +25,19 @@ class FilmeService
         return Filme::getFilmesPorUsuario($this->database, $usuario_id);
     }
 
-    public function validarDados(array $dados)
+    public function validarDados($dados)
     {
-        $this->validacao = Validacao::validarCampos([
+        $regras = [
             'titulo' => ['required', 'min:3', 'unique:filmes'],
             'diretor' => ['required', 'min:6', 'string'],
             'categoria' => ['required', 'string'],
             'sinopse' => ['required', 'string'],
-            'ano_de_lancamento' => ['required', 'numeric', 'max:4', 'min:4'],
-        ], $dados, $this->database);
+            'ano_de_lancamento' => ['required', 'numeric', 'max:4', 'min:4']
+        ];
 
-        $this->validacao->errosValidacao();
+        $validador = $this->validacao = Validacao::validarCampos($regras, $dados, $this->database);
 
-        return !flash()->hasMensagem('error');
+        return $validador->erros();
     }
 
     public function criarFilme($dados, $usuario_id)
@@ -42,30 +47,50 @@ class FilmeService
 
     public function verificarFilmeFavoritado($dados)
     {
-        $salvos = Filme::verificarFavoritado($this->database, $dados);
-
-        return !empty($salvos);
+        return Filme::verificarFavoritado($this->database, $dados);
     }
 
     public function favoritarFilme($dados)
     {
-        if (!isset($dados['usuario_id'], $dados['filme_id']) || !is_numeric($dados['usuario_id']) || !is_numeric($dados['filme_id'])) {
+        if (!isset($dados['filme_id'], $dados['usuario_id']) || !is_numeric($dados['filme_id'])) {
             return false;
         }
 
-        Filme::favoritar($this->database, $dados);
+        return Filme::favoritar($this->database, $dados);
+    }
 
-        return true;
+    public function obterStatusFilmeParaUsuario($filme_id, $usuario_id)
+    {
+        $dados = [
+            'filme_id' => $filme_id,
+            'usuario_id' => $usuario_id
+        ];
+
+        $filme = Filme::getFilmePorId($this->database, $filme_id);
+
+        if (!$filme) {
+            return [
+                'valido' => false,
+                'mensagem' => 'Filme não encontrado.'
+            ];
+        }
+
+        $favoritado = Filme::verificarFavoritado($this->database, $dados);
+
+        return [
+            'valido' => true,
+            'filme' => $filme,
+            'favoritado' => $favoritado,
+            'dados' => $dados
+        ];
     }
 
     public function desfavoritarFilme($dados)
     {
-        if (!isset($dados['usuario_id'], $dados['filme_id']) || !is_numeric($dados['usuario_id']) || !is_numeric($dados['filme_id'])) {
+        if (!isset($dados['filme_id'], $dados['usuario_id']) || !is_numeric($dados['filme_id'])) {
             return false;
         }
 
-        Filme::desfavoritar($this->database, $dados);
-
-        return true;
+        return Filme::desfavoritar($this->database, $dados);
     }
 }
