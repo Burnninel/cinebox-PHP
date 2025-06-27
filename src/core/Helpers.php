@@ -30,7 +30,7 @@ function auth()
         return false;
     }
 
-    return $_SESSION['auth'];
+    return (object) $_SESSION['auth'];
 }
 
 function redirectNotPost($url)
