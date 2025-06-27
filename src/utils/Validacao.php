@@ -119,6 +119,22 @@ class Validacao
         }
     }
 
+    private function between($campo, $valor, $between)
+    {
+        [$min, $max] = array_pad(explode('-', $between, 2), 2, null);
+
+        if ($valor < $min || $valor > $max) {
+            $this->erros[] = [$campo, "O campo $campo deve estar entre $min e $max."];
+        }
+    }
+
+    private function length($campo, $valor, $length)
+    {
+        if (strlen($valor) != $length) {
+            $this->erros[] = [$campo, "O campo $campo precisa ter $length dígitos."];
+        }
+    }
+
     public function erros()
     {
         $resultado = [];
