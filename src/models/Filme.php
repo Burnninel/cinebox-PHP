@@ -11,23 +11,29 @@ class Filme
     public $total_avaliacoes;
     public $media_avaliacoes;
 
-    public function query($database, $where, $params = [])
+    public function query($database, $where = '', $params = [])
     {
+        $sql = "
+            SELECT 
+                f.*,
+                COUNT(a.id) AS total_avaliacoes,
+                ROUND(AVG(a.nota), 1) AS media_avaliacoes
+            FROM 
+                filmes AS f
+            LEFT JOIN
+                avaliacoes AS a ON f.id = a.filme_id
+        ";
+
+        if ($where) {
+            $sql .= " WHERE $where";
+        }
+
+        $sql .= " GROUP BY f.id";
+
         return $database->query(
-            query: "
-                SELECT 
-                    f.*,
-                    COUNT(a.id) AS total_avaliacoes,
-                    ROUND(AVG(a.nota), 1) AS media_avaliacoes
-                FROM 
-                    filmes AS f
-                LEFT JOIN
-                    avaliacoes AS a ON f.id = a.filme_id
-                WHERE $where
-                GROUP BY f.id;
-            ",
-            params: $params,
-            class: self::class
+            query: $sql,
+            class: self::class,
+            params: $params
         );
     }
 
@@ -37,13 +43,13 @@ class Filme
             $database,
             where: 'f.id = :id',
             params: ['id' => $id]
-        )->fetch();
+        )->fetch() ?: null;
     }
 
     public static function getFilmes($database, $pesquisar)
     {
         if (!$pesquisar) {
-            return [];
+            return (new self)->query($database)->fetchAll();
         }
 
         $where = 'LOWER(f.titulo) LIKE :pesquisar 
@@ -107,9 +113,11 @@ class Filme
 
     public static function desfavoritar($database, $dados)
     {
-        return $database->query(
+        $stmt = $database->query(
             "DELETE FROM usuarios_filmes WHERE usuario_id = :usuario_id AND filme_id = :filme_id",
             params: $dados
         );
+
+        return $stmt->rowCount() > 0;
     }
 }
