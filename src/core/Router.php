@@ -8,7 +8,7 @@ $method = $_SERVER['REQUEST_METHOD'];
 $segments = explode('/', $uri);
 
 $resource = $segments[0] ?? '';
-$id = $segments[1] ?? null;
+$param = $segments[1] ?? null;
 $action = $segments[2] ?? null;
 $method = $_SERVER['REQUEST_METHOD'];
 
@@ -35,14 +35,20 @@ switch ($resource) {
         $controller = new FilmeController($database);
         switch ($method) {
             case 'GET':
-                $id ? $controller->show($id) : $controller->index();
+                if (!$param) {
+                    $controller->index();
+                } elseif ($param === 'meus-filmes') {
+                    $controller->meusFilmes();
+                } else {
+                    $controller->show($param);
+                }
                 break;
 
             case 'POST':
-                if ($id && $action === 'favoritar') {
-                    $controller->favoritarFilme($id);
-                } elseif ($id && $action === 'desfavoritar') {
-                    $controller->desfavoritarFilme($id);
+                if ($param && $action === 'favoritar') {
+                    $controller->favoritarFilme($param);
+                } elseif ($param && $action === 'desfavoritar') {
+                    $controller->desfavoritarFilme($param);
                 } else {
                     $controller->store();
                 }
@@ -54,10 +60,10 @@ switch ($resource) {
         $controller = new AvaliacaoController($database);
         switch ($method) {
             case 'POST':
-                $controller->store($id);
+                $controller->store($param);
                 break;
             case 'DELETE':
-                $controller->destroy($id);
+                $controller->destroy($param);
                 break;
         }
         break;
@@ -66,3 +72,8 @@ switch ($resource) {
         http_response_code(404);
         echo json_encode(['error' => 'Rota não encontrada']);
 }
+
+
+//  case 'GET':
+//                 $param ? $controller->show($param) : $controller->index();
+//                 break;

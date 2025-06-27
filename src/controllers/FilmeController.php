@@ -46,11 +46,23 @@ class FilmeController extends Controller
 
     public function meusFilmes()
     {
-        $usuario_id = usuarioAutenticadoOuRedireciona('/login');
+        $usuario = usuarioAutenticadoOuJson401();
 
-        $filmes = $this->filmeService->buscarFilmesUsuario($usuario_id);
+        $filmes = $this->filmeService->buscarFilmesUsuario($usuario->id);
 
-        $this->view('usuarioFilmes/index', ['filmes' => $filmes]);
+        if (empty($filmes)) {
+            jsonResponse([
+                'status' => false, 
+                'message' => 'Nenhum filme encontrado para este usuário.', 
+                'filmes' => []
+            ]);
+        }
+
+        jsonResponse([
+            'status' => true, 
+            'message' => 'Filmes localizados com sucesso!', 
+            'filmes' => $filmes
+        ]);
     }
 
     public function store()
@@ -66,7 +78,11 @@ class FilmeController extends Controller
         $erros = $this->filmeService->validarDados($dados);
 
         if (!empty($erros)) {
-            jsonResponse(['status' => false, 'message' => 'Erro ao cadastrar filme.', 'errors' => $erros], 400);
+            jsonResponse([
+                'status' => false,
+                'message' => 'Erro ao cadastrar filme.', 
+                'errors' => $erros
+            ], 400);
         }
 
         $this->filmeService->criarFilme($dados, $usuario->id);
