@@ -72,8 +72,3 @@ switch ($resource) {
         http_response_code(404);
         echo json_encode(['error' => 'Rota não encontrada']);
 }
-
-
-//  case 'GET':
-//                 $param ? $controller->show($param) : $controller->index();
-//                 break;
