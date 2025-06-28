@@ -6,7 +6,7 @@ class AvaliacaoController extends Controller
 
     public function __construct($database)
     {
-        $this->avaliacaoService = new AvaliacoesService($database);
+        $this->avaliacaoService = new AvaliacaoService($database);
     }
 
     public function store($id)
