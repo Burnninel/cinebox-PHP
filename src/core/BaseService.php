@@ -1,6 +1,6 @@
 <?php
 
-Class Service {
+Class BaseService {
     protected function safe($callback, $errorMessage)
     {
         try {

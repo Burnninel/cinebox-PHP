@@ -1,6 +1,6 @@
 <?php
 
-class AuthController extends Controller
+class AuthController extends BaseController
 {
     private $authService;
 

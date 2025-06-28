@@ -1,6 +1,6 @@
 <?php
 
-class AvaliacaoController extends Controller
+class AvaliacaoController extends BaseController
 {
     private $avaliacaoService;
 

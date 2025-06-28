@@ -1,6 +1,6 @@
 <?php
 
-class FilmeController extends Controller
+class FilmeController extends BaseController
 {
     private $filmeService;
     private $avaliacaoService;
@@ -8,7 +8,7 @@ class FilmeController extends Controller
     public function __construct($database)
     {
         $this->filmeService = new FilmeService($database);
-        $this->avaliacaoService = new AvaliacoesService($database);
+        $this->avaliacaoService = new AvaliacaoService($database);
     }
 
     public function index()
@@ -26,22 +26,30 @@ class FilmeController extends Controller
 
     public function show($id)
     {
-        $filme = $this->filmeService->buscarFilmePorId($id);
+        try {
+            $filme = $this->filmeService->buscarFilmePorId($id);
 
-        if (!$filme) {
-            jsonResponse(['status' => false, 'message' => 'Filme não encontrado!'], 400);
+            if (!$filme) {
+                jsonResponse(['status' => false, 'message' => 'Filme não encontrado!'], 400);
+            }
+
+            $avaliacoes = $this->avaliacaoService->listarAvaliacoes($id);
+
+            jsonResponse([
+                'status' => true,
+                'message' => 'Filme localizado com sucesso!',
+                'data' => [
+                    'filme' => $filme,
+                    'avaliacoes' => $avaliacoes
+                ]
+            ]);
+        } catch (Exception $e) {
+            jsonResponse([
+                'status' => false,
+                'message' => 'Erro interno ao consultar filme.',
+                'detalhes' => $e->getMessage()
+            ], 500);
         }
-
-        $avaliacoes = $this->avaliacaoService->listarAvaliacoes($id);
-
-        jsonResponse([
-            'status' => true,
-            'message' => 'Filme localizado com sucesso!',
-            'data' => [
-                'filme' => $filme,
-                'avaliacoes' => $avaliacoes
-            ]
-        ]);
     }
 
     public function meusFilmes()
@@ -52,15 +60,15 @@ class FilmeController extends Controller
 
         if (empty($filmes)) {
             jsonResponse([
-                'status' => false, 
-                'message' => 'Nenhum filme encontrado para este usuário.', 
+                'status' => false,
+                'message' => 'Nenhum filme encontrado para este usuário.',
                 'filmes' => []
             ]);
         }
 
         jsonResponse([
-            'status' => true, 
-            'message' => 'Filmes localizados com sucesso!', 
+            'status' => true,
+            'message' => 'Filmes localizados com sucesso!',
             'filmes' => $filmes
         ]);
     }
@@ -76,7 +84,7 @@ class FilmeController extends Controller
         if (!empty($erros)) {
             jsonResponse([
                 'status' => false,
-                'message' => 'Erro ao cadastrar filme.', 
+                'message' => 'Erro ao cadastrar filme.',
                 'errors' => $erros
             ], 400);
         }

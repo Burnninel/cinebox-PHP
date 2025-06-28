@@ -1,6 +1,6 @@
 <?php
 
-class AvaliacaoService extends Service
+class AvaliacaoService extends BaseService
 {
     protected $database;
     protected $validacao;

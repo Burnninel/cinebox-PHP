@@ -1,6 +1,6 @@
 <?php
 
-class Controller
+class BaseController
 {
     protected function safe($callback)
     {
