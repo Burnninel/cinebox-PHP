@@ -46,7 +46,7 @@ class FilmeController extends Controller
 
     public function meusFilmes()
     {
-        $usuario = usuarioAutenticadoOuJson401();
+        $usuario = requireAuthenticatedUser();
 
         $filmes = $this->filmeService->buscarFilmesUsuario($usuario->id);
 
@@ -67,13 +67,9 @@ class FilmeController extends Controller
 
     public function store()
     {
-        $dados = json_decode(file_get_contents('php://input'), true) ?: [];
+        $dados = getRequestData();
 
-        if (empty($dados)) {
-            jsonResponse(['status' => false, 'message' => 'Requisição inválida: nenhum dado foi enviado.'], 400);
-        }
-
-        $usuario = usuarioAutenticadoOuJson401();
+        $usuario = requireAuthenticatedUser();
 
         $erros = $this->filmeService->validarDados($dados);
 
@@ -92,7 +88,7 @@ class FilmeController extends Controller
 
     public function favoritarFilme($id)
     {
-        $usuario = usuarioAutenticadoOuJson401();
+        $usuario = requireAuthenticatedUser();
 
         $resultado = $this->filmeService->obterStatusFilmeParaUsuario($id, $usuario->id);
 
@@ -115,7 +111,7 @@ class FilmeController extends Controller
 
     public function desfavoritarFilme($id)
     {
-        $usuario = usuarioAutenticadoOuJson401();
+        $usuario = requireAuthenticatedUser();
 
         $resultado = $this->filmeService->obterStatusFilmeParaUsuario($id, $usuario->id);
 

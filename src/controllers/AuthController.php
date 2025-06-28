@@ -11,11 +11,7 @@ class AuthController extends Controller
 
     public function store()
     {
-        $dados = json_decode(file_get_contents('php://input'), true) ?: [];
-
-        if (empty($dados)) {
-            jsonResponse(['status' => false, 'message' => 'Requisição inválida: nenhum dado foi enviado.'], 400);
-        }
+        $dados = getRequestData();
 
         $erros = $this->authService->validarRegistro($dados);
 
@@ -34,11 +30,7 @@ class AuthController extends Controller
 
     public function login()
     {
-        $dados = json_decode(file_get_contents('php://input'), true);
-
-        if (empty($dados)) {
-            jsonResponse(['status' => false, 'message' => 'Requisição inválida: nenhum dado foi enviado.'], 400);
-        }
+        $dados = getRequestData();
 
         $erros = $this->authService->validarLogin($dados);
 

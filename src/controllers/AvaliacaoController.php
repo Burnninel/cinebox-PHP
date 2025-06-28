@@ -11,9 +11,9 @@ class AvaliacaoController extends Controller
 
     public function store($id)
     {
-        $dados = json_decode(file_get_contents('php://input'), true) ?: [];
+        $dados = getRequestData();
 
-        $usuario = usuarioAutenticadoOuJson401();
+        $usuario = requireAuthenticatedUser();
 
         $erros = $this->avaliacaoService->validarDados($dados);
 
@@ -44,7 +44,7 @@ class AvaliacaoController extends Controller
 
     public function destroy($id)
     {
-        $usuario = usuarioAutenticadoOuJson401();
+        $usuario = requireAuthenticatedUser();
 
         $dados = [
             'id' => $id,

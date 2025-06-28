@@ -19,11 +19,6 @@ function config($chave = null)
     return $config;
 }
 
-function flash()
-{
-    return new Flash;
-}
-
 function auth()
 {
     if (!isset($_SESSION['auth'])) {
@@ -33,39 +28,7 @@ function auth()
     return (object) $_SESSION['auth'];
 }
 
-function redirectNotPost($url)
-{
-    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-        redirect($url);
-        return;
-    }
-}
-
-function flashRedirect($status, $mensagem, $url)
-{
-    flash()->setMensagem($status, $mensagem);
-    header("Location: $url");
-    exit;
-}
-
-function redirect($url)
-{
-    header("Location: $url");
-    exit;
-}
-
-function usuarioAutenticadoOuRedireciona($url)
-{
-    $usuario_id = auth()->id;
-
-    if (!$usuario_id) {
-        flashRedirect('error', 'Usuário não autenticado!', $url, 'filme');
-    }
-
-    return $usuario_id;
-}
-
-function usuarioAutenticadoOuJson401()
+function requireAuthenticatedUser()
 {
     $usuario = auth();
 
@@ -78,7 +41,18 @@ function usuarioAutenticadoOuJson401()
     return $usuario;
 }
 
-function jsonResponse($dados, $status = 200) 
+function getRequestData()
+{
+    $dados = json_decode(file_get_contents('php://input'), true) ?: [];
+
+    if (empty($dados)) {
+        jsonResponse(['status' => false, 'message' => 'Requisição inválida: nenhum dado foi enviado.'], 400);
+    }
+
+    return $dados;
+}
+
+function jsonResponse($dados, $status = 200)
 {
     http_response_code($status);
     echo json_encode($dados);
