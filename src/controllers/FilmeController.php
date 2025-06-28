@@ -13,20 +13,22 @@ class FilmeController extends BaseController
 
     public function index()
     {
-        $pesquisar = trim($_GET['pesquisar'] ?? '');
+        $this->safe(function () {
+            $pesquisar = trim($_GET['pesquisar'] ?? '');
 
-        $filmes = $this->filmeService->buscarFilmes($pesquisar);
+            $filmes = $this->filmeService->buscarFilmes($pesquisar);
 
-        if (empty($filmes)) {
-            jsonResponse(['status' => false, 'message' => 'Nenhum filme encontrado para o termo informado.', 'filmes' => []]);
-        }
+            if (empty($filmes)) {
+                jsonResponse(['status' => false, 'message' => 'Nenhum filme encontrado para o termo informado.', 'filmes' => []]);
+            }
 
-        jsonResponse(['status' => true, 'message' => 'Filmes localizados com sucesso!', 'filmes' => $filmes]);
+            jsonResponse(['status' => true, 'message' => 'Filmes localizados com sucesso!', 'filmes' => $filmes]);
+        });
     }
 
     public function show($id)
     {
-        try {
+        $this->safe(function () use ($id) {
             $filme = $this->filmeService->buscarFilmePorId($id);
 
             if (!$filme) {
@@ -43,100 +45,102 @@ class FilmeController extends BaseController
                     'avaliacoes' => $avaliacoes
                 ]
             ]);
-        } catch (Exception $e) {
-            jsonResponse([
-                'status' => false,
-                'message' => 'Erro interno ao consultar filme.',
-                'detalhes' => $e->getMessage()
-            ], 500);
-        }
+        });
     }
 
     public function meusFilmes()
     {
-        $usuario = requireAuthenticatedUser();
+        $this->safe(function () {
+            $usuario = requireAuthenticatedUser();
 
-        $filmes = $this->filmeService->buscarFilmesUsuario($usuario->id);
+            $filmes = $this->filmeService->buscarFilmesUsuario($usuario->id);
 
-        if (empty($filmes)) {
+            if (empty($filmes)) {
+                jsonResponse([
+                    'status' => false,
+                    'message' => 'Nenhum filme encontrado para este usuário.',
+                    'filmes' => []
+                ]);
+            }
+
             jsonResponse([
-                'status' => false,
-                'message' => 'Nenhum filme encontrado para este usuário.',
-                'filmes' => []
+                'status' => true,
+                'message' => 'Filmes localizados com sucesso!',
+                'filmes' => $filmes
             ]);
-        }
-
-        jsonResponse([
-            'status' => true,
-            'message' => 'Filmes localizados com sucesso!',
-            'filmes' => $filmes
-        ]);
+        });
     }
 
     public function store()
     {
-        $dados = getRequestData();
+        $this->safe(function () {
+            $dados = getRequestData();
 
-        $usuario = requireAuthenticatedUser();
+            $usuario = requireAuthenticatedUser();
 
-        $erros = $this->filmeService->validarDados($dados);
+            $erros = $this->filmeService->validarDados($dados);
 
-        if (!empty($erros)) {
-            jsonResponse([
-                'status' => false,
-                'message' => 'Erro ao cadastrar filme.',
-                'errors' => $erros
-            ], 400);
-        }
+            if (!empty($erros)) {
+                jsonResponse([
+                    'status' => false,
+                    'message' => 'Erro ao cadastrar filme.',
+                    'errors' => $erros
+                ], 400);
+            }
 
-        $this->filmeService->criarFilme($dados, $usuario->id);
+            $this->filmeService->criarFilme($dados, $usuario->id);
 
-        jsonResponse(['status' => true, 'message' => 'Filme cadastrado com sucesso!']);
+            jsonResponse(['status' => true, 'message' => 'Filme cadastrado com sucesso!']);
+        });
     }
 
     public function favoritarFilme($id)
     {
-        $usuario = requireAuthenticatedUser();
+        $this->safe(function ()  use ($id) {
+            $usuario = requireAuthenticatedUser();
 
-        $resultado = $this->filmeService->obterStatusFilmeParaUsuario($id, $usuario->id);
+            $resultado = $this->filmeService->obterStatusFilmeParaUsuario($id, $usuario->id);
 
-        if (!$resultado['valido']) {
-            jsonResponse(['status' => false, 'message' => $resultado['mensagem']], 400);
-        }
+            if (!$resultado['valido']) {
+                jsonResponse(['status' => false, 'message' => $resultado['mensagem']], 400);
+            }
 
-        if ($resultado['favoritado']) {
-            jsonResponse(['status' => false, 'message' => 'Filme já favoritado!'], 400);
-        }
+            if ($resultado['favoritado']) {
+                jsonResponse(['status' => false, 'message' => 'Filme já favoritado!'], 400);
+            }
 
-        $favoritar = $this->filmeService->favoritarFilme($resultado['dados']);
+            $favoritar = $this->filmeService->favoritarFilme($resultado['dados']);
 
-        if (!$favoritar) {
-            jsonResponse(['status' => false, 'message' => 'Erro ao favoritar filme!'], 400);
-        }
+            if (!$favoritar) {
+                jsonResponse(['status' => false, 'message' => 'Erro ao favoritar filme!'], 400);
+            }
 
-        jsonResponse(['status' => true, 'message' => 'Adicionado aos favoritos!']);
+            jsonResponse(['status' => true, 'message' => 'Adicionado aos favoritos!']);
+        });
     }
 
     public function desfavoritarFilme($id)
     {
-        $usuario = requireAuthenticatedUser();
+        $this->safe(function ()  use ($id) {
+            $usuario = requireAuthenticatedUser();
 
-        $resultado = $this->filmeService->obterStatusFilmeParaUsuario($id, $usuario->id);
+            $resultado = $this->filmeService->obterStatusFilmeParaUsuario($id, $usuario->id);
 
-        if (!$resultado['valido']) {
-            jsonResponse(['status' => false, 'message' => $resultado['mensagem']], 400);
-        }
+            if (!$resultado['valido']) {
+                jsonResponse(['status' => false, 'message' => $resultado['mensagem']], 400);
+            }
 
-        if (!$resultado['favoritado']) {
-            jsonResponse(['status' => false, 'message' => 'Filme não esta favoritado!'], 400);
-        }
+            if (!$resultado['favoritado']) {
+                jsonResponse(['status' => false, 'message' => 'Filme não esta favoritado!'], 400);
+            }
 
-        $desfavoritar = $this->filmeService->desfavoritarFilme($resultado['dados']);
+            $desfavoritar = $this->filmeService->desfavoritarFilme($resultado['dados']);
 
-        if (!$desfavoritar) {
-            jsonResponse(['status' => false, 'message' => 'Erro ao desfavoritar filme!'], 400);
-        }
+            if (!$desfavoritar) {
+                jsonResponse(['status' => false, 'message' => 'Erro ao desfavoritar filme!'], 400);
+            }
 
-        jsonResponse(['status' => true, 'message' => 'Removido dos favoritos!']);
+            jsonResponse(['status' => true, 'message' => 'Removido dos favoritos!']);
+        });
     }
 }

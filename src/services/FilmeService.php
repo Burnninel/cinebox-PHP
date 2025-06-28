@@ -1,6 +1,6 @@
 <?php
 
-class FilmeService
+class FilmeService extends BaseService
 {
     protected $database;
     protected $validacao;
@@ -12,17 +12,26 @@ class FilmeService
 
     public function buscarFilmes($pesquisar)
     {
-        return Filme::buscarFilmes($this->database, $pesquisar);
+        return $this->safe(
+            fn() => Filme::buscarFilmes($this->database, $pesquisar),
+            'Erro ao buscar filmes no banco de dados.'
+        );
     }
 
     public function buscarFilmePorId($id)
     {
-        return Filme::buscarFilmePorId($this->database, $id);
+        return $this->safe(
+            fn() => Filme::buscarFilmePorId($this->database, $id),
+            'Erro ao buscar filme no banco de dados.'
+        );
     }
 
     public function buscarFilmesUsuario($usuario_id)
     {
-        return Filme::buscarFilmesPorUsuario($this->database, $usuario_id);
+        return $this->safe(
+            fn() => Filme::buscarFilmesPorUsuario($this->database, $usuario_id),
+            'Erro ao buscar filmes do usuario no banco de dados.'
+        );
     }
 
     public function validarDados($dados)
@@ -44,12 +53,18 @@ class FilmeService
 
     public function criarFilme($dados, $usuario_id)
     {
-        return Filme::criarFilme($this->database, $dados, $usuario_id);
+        return $this->safe(
+            fn() => Filme::criarFilme($this->database, $dados, $usuario_id),
+            'Erro ao incluir filme no banco de dados.'
+        );
     }
 
     public function verificarFilmeFavoritado($dados)
     {
-        return Filme::verificarFilmeFavoritado($this->database, $dados);
+        return $this->safe(
+            fn() => Filme::verificarFilmeFavoritado($this->database, $dados),
+            'Erro ao validar filmes favoritos no banco de dados.'
+        );
     }
 
     public function favoritarFilme($dados)
@@ -58,7 +73,10 @@ class FilmeService
             return false;
         }
 
-        return Filme::favoritarFilme($this->database, $dados);
+        return $this->safe(
+            fn() => Filme::favoritarFilme($this->database, $dados),
+            'Erro ao registrar filme favorito no banco de dados.'
+        );
     }
 
     public function obterStatusFilmeParaUsuario($filme_id, $usuario_id)
@@ -68,7 +86,10 @@ class FilmeService
             'usuario_id' => $usuario_id
         ];
 
-        $filme = Filme::buscarFilmePorId($this->database, $filme_id);
+        $filme = $this->safe(
+            fn() => Filme::buscarFilmePorId($this->database, $filme_id),
+            'Erro ao consultar filme no banco de dados.'
+        );
 
         if (!$filme) {
             return [
@@ -77,7 +98,10 @@ class FilmeService
             ];
         }
 
-        $favoritado = Filme::verificarFilmeFavoritado($this->database, $dados);
+        $favoritado = $this->safe(
+            fn() => Filme::verificarFilmeFavoritado($this->database, $dados),
+            'Erro ao consultar filme no banco de dados.'
+        );
 
         return [
             'valido' => true,
@@ -93,6 +117,9 @@ class FilmeService
             return false;
         }
 
-        return Filme::desfavoritarFilme($this->database, $dados);
+        return $this->safe(
+            fn() => Filme::desfavoritarFilme($this->database, $dados),
+            'Erro ao remover filme dos favoritos no banco de dados.'
+        );
     }
 }
