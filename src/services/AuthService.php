@@ -1,6 +1,6 @@
 <?php
 
-class AuthService
+class AuthService extends BaseService
 {
     protected $database;
     protected $validacao;
@@ -17,7 +17,10 @@ class AuthService
             'senha' => ['required'],
         ];
 
-        $validador = Validacao::validarCampos($regras, $dados, $this->database);
+        $validador = $this->safe(
+            fn() => Validacao::validarCampos($regras, $dados, $this->database),
+            'Erro ao consultar banco de dados.'
+        );
 
         return $validador->erros();
     }
@@ -30,13 +33,20 @@ class AuthService
             'senha' => ['required', 'min:8', 'max:24', 'strong', 'confirmed'],
         ];
 
-        $validador = Validacao::validarCampos($regras, $dados, $this->database);
+        $validador = $this->safe(
+            fn() => Validacao::validarCampos($regras, $dados, $this->database),
+            'Erro ao consultar banco de dados.'
+        );
+
         return $validador->erros();
     }
 
     public function autenticar($email, $senha)
     {
-        $usuario = Usuario::buscarUsuarioCredenciais($this->database, $email);
+        $usuario = $this->safe(
+            fn() => Usuario::buscarUsuarioCredenciais($this->database, $email),
+            'Erro ao consultar banco de dados.'
+        );
         return $usuario && $usuario->verificarSenha($senha) ? $usuario : null;
     }
 
@@ -48,6 +58,9 @@ class AuthService
             'senha' => Usuario::hashSenha($dados['senha'] ?? '')
         ];
 
-        return Usuario::cadastrarUsuario($this->database, $dadosFiltrados);
+        return $this->safe(
+            fn() => Usuario::cadastrarUsuario($this->database, $dadosFiltrados),
+            'Erro ao inserir usuario no banco de dados.'
+        );
     }
 }
