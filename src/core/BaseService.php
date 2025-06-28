@@ -6,7 +6,7 @@ Class BaseService {
         try {
             return $callback();
         } catch (PDOException $e) {
-            throw new Exception("{$errorMessage}|||{$e->getMessage()}", 500);
+            throw new AppException($errorMessage, $e->getMessage(), 500);
         }
     }
 }

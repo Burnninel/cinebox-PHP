@@ -6,13 +6,17 @@ class BaseController
     {
         try {
             return $callback();
-        } catch (Throwable $e) {
-            [$message, $detalhes] = array_pad(explode('|||', $e->getMessage()), 2, 'Ocorreu um erro interno.');
-
+        } catch (AppException $e) {
             jsonResponse([
                 'success' => false,
-                'message' => $message,
-                'detalhes' => $detalhes
+                'message' => $e->getMessage(),
+                'detalhes' => $e->getDetalhes()
+            ], 500);
+        } catch (Throwable $e) {
+            jsonResponse([
+                'success' => false,
+                'message' => 'Erro interno do servidor.',
+                'detalhes' => $e->getMessage()
             ], 500);
         }
     }
