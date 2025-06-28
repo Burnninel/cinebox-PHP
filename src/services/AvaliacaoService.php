@@ -1,6 +1,6 @@
 <?php
 
-class AvaliacoesService
+class AvaliacaoService
 {
     protected $database;
     protected $validacao;
