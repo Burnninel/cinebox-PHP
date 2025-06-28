@@ -1,6 +1,6 @@
 <?php
 
-class AvaliacaoService
+class AvaliacaoService extends Service
 {
     protected $database;
     protected $validacao;
@@ -18,12 +18,12 @@ class AvaliacaoService
 
     public function buscarFilmePorId($id)
     {
-        try {
-            if ($this->idInvalido($id)) return false;
-            return Filme::buscarFilmePorId($this->database, $id);
-        } catch (PDOException $e) {
-            throw new Exception('Erro ao buscar filme no banco de dados.');
-        }
+        if ($this->idInvalido($id)) return false;
+
+        return $this->safe(
+            fn() => Filme::buscarFilmePorId($this->database, $id),
+            'Erro ao buscar filme no banco de dados.'
+        );
     }
 
     public function validarDados($dados)
@@ -40,56 +40,54 @@ class AvaliacaoService
 
     public function criarAvaliacao($dados, $id, $usuario)
     {
-        try {
-            if ($this->idInvalido($id)) return false;
+        if ($this->idInvalido($id)) return false;
 
-            $dados += [
-                'filme_id' => $id,
-                'usuario_id' => $usuario
-            ];
+        $dados += [
+            'filme_id' => $id,
+            'usuario_id' => $usuario
+        ];
 
-            return Avaliacao::criarAvaliacao($this->database, $dados);
-        } catch (PDOException $e) {
-            throw new Exception('Erro ao incluir avaliação no banco de dados.');
-        }
+        return $this->safe(
+            fn() => Avaliacao::criarAvaliacao($this->database, $dados),
+            'Erro ao incluir avaliação no banco de dados.'
+        );
     }
 
     public function listarAvaliacoes($id)
     {
-        try {
-            if ($this->idInvalido($id)) return false;
-            return Avaliacao::buscarAvaliacoesFilme($this->database, $id);
-        } catch (PDOException $e) {
-            throw new Exception('Erro ao consultar avaliações do filme no banco de dados.');
-        }
+        if ($this->idInvalido($id)) return false;
+
+        return $this->safe(
+            fn() => Avaliacao::buscarAvaliacoesFilme($this->database, $id),
+            'Erro ao consultar avaliações do filme no banco de dados.'
+        );
     }
 
     public function buscarAvaliacaoUsuarioFilme($id, $usuario)
     {
-        try {
-            if ($this->idInvalido($id)) return false;
-            return Avaliacao::buscarAvaliacaoUsuarioFilme($this->database, $id, $usuario);
-        } catch (PDOException $e) {
-            throw new Exception('Erro ao consultar avaliacoes do usuario no banco de dados.');
-        }
+        if ($this->idInvalido($id)) return false;
+
+        return $this->safe(
+            fn() => Avaliacao::buscarAvaliacaoUsuarioFilme($this->database, $id, $usuario),
+            'Erro ao consultar avaliacoes do usuario no banco de dados.'
+        );
     }
 
     public function buscarAvaliacaoPorId($id)
     {
-        try {
-            if ($this->idInvalido($id)) return false;
-            return Avaliacao::buscarAvaliacao($this->database, $id);
-        } catch (PDOException $e) {
-            throw new Exception('Erro ao consultar avaliacao no banco de dados.');
-        }
+        if ($this->idInvalido($id)) return false;
+
+        return $this->safe(
+            fn() => Avaliacao::buscarAvaliacao($this->database, $id),
+            'Erro ao consultar avaliacao no banco de dados.'
+        );
     }
 
     public function excluirAvaliacao($dados)
     {
-        try {
-            return Avaliacao::removerAvaliacao($this->database, $dados);
-        } catch (PDOException $e) {
-            throw new Exception('Erro ao consultar avaliacao no banco de dados.');
-        }
+        return $this->safe(
+            fn() => Avaliacao::removerAvaliacao($this->database, $dados),
+            'Erro ao consultar avaliacao no banco de dados.'
+        );
     }
 }

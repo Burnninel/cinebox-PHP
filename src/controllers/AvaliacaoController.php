@@ -11,60 +11,60 @@ class AvaliacaoController extends Controller
 
     public function store($id)
     {
-        $dados = getRequestData();
+        $this->safe(function () use ($id) {
+            $dados = getRequestData();
 
-        $usuario = requireAuthenticatedUser();
+            $usuario = requireAuthenticatedUser();
 
-        $erros = $this->avaliacaoService->validarDados($dados);
+            $erros = $this->avaliacaoService->validarDados($dados);
+            if (!empty($erros)) {
+                jsonResponse(['success' => false, "message" => "Dados inválidos!", "errors" => $erros], 400);
+            }
 
-        if (!empty($erros)) {
-            jsonResponse(['success' => false, "message" => "Dados inválidos!", "errors" => $erros], 400);
-        }
+            $filme = $this->avaliacaoService->buscarFilmePorId($id);
+            if (!$filme) {
+                jsonResponse(['success' => false, "message" => "Filme não encontrado!"], 400);
+            }
 
-        $filme = $this->avaliacaoService->buscarFilmePorId($id);
+            $avaliado = ($this->avaliacaoService->buscarAvaliacaoUsuarioFilme($id, $usuario->id));
+            if (!empty($avaliado)) {
+                jsonResponse(['success' => false, "message" => "Filme já avaliado!"], 400);
+            }
 
-        if (!$filme) {
-            jsonResponse(['success' => false, "message" => "Filme não encontrado!"], 400);
-        }
+            $avaliacao = $this->avaliacaoService->criarAvaliacao($dados, $id, $usuario->id);
+            if (!$avaliacao) {
+                jsonResponse(['success' => false, "message" => "Erro ao salvar avaliação!"], 400);
+            }
 
-        $avaliado = ($this->avaliacaoService->buscarAvaliacaoUsuarioFilme($id, $usuario->id));
-
-        if (!empty($avaliado)) {
-            jsonResponse(['success' => false, "message" => "Filme já avaliado!"], 400);
-        }
-
-        $avaliacao = $this->avaliacaoService->criarAvaliacao($dados, $id, $usuario->id);
-
-        if (!$avaliacao) {
-            jsonResponse(['success' => false, "message" => "Erro ao salvar avaliação!"], 400);
-        }
-
-        jsonResponse(['success' => true, "message" => "Filme avaliado com sucesso!"]);
+            jsonResponse(['success' => true, "message" => "Filme avaliado com sucesso!"]);
+        });
     }
 
     public function destroy($id)
     {
-        $usuario = requireAuthenticatedUser();
+        $this->safe(function () use ($id) {
+            $usuario = requireAuthenticatedUser();
 
-        $dados = [
-            'id' => $id,
-            'usuario_id' => $usuario->id
-        ];
+            $dados = [
+                'id' => $id,
+                'usuario_id' => $usuario->id
+            ];
 
-        $avaliacao = $this->avaliacaoService->buscarAvaliacaoPorId($id);
+            $avaliacao = $this->avaliacaoService->buscarAvaliacaoPorId($id);
 
-        if (!$avaliacao) {
-            jsonResponse(['success' => false, 'message' => 'Avaliação não encontrada.'], 400);
-        }
+            if (!$avaliacao) {
+                jsonResponse(['success' => false, 'message' => 'Avaliação não encontrada.'], 400);
+            }
 
-        if ($avaliacao['usuario_id'] !== $usuario->id) {
-            jsonResponse(['success' => false, 'message' => 'Você não tem permissão para excluir esta avaliação.'], 403);
-        }
+            if ($avaliacao['usuario_id'] !== $usuario->id) {
+                jsonResponse(['success' => false, 'message' => 'Você não tem permissão para excluir esta avaliação.'], 403);
+            }
 
-        if (!$this->avaliacaoService->excluirAvaliacao($dados)) {
-            jsonResponse(['success' => false, "message" => "Erro ao excluir avaliação!"], 400);
-        }
+            if (!$this->avaliacaoService->excluirAvaliacao($dados)) {
+                jsonResponse(['success' => false, "message" => "Erro ao excluir avaliação!"], 400);
+            }
 
-        jsonResponse(['success' => true, "message" => "Avaliação removida com sucesso!"]);
+            jsonResponse(['success' => true, "message" => "Avaliação removida com sucesso!"]);
+        });
     }
 }

@@ -2,9 +2,18 @@
 
 class Controller
 {
-    public function view($view, $data = [])
+    protected function safe($callback)
     {
-        extract($data);
-        require __DIR__ . "/../views/templates/app.php";
+        try {
+            return $callback();
+        } catch (Throwable $e) {
+            [$message, $detalhes] = array_pad(explode('|||', $e->getMessage()), 2, 'Ocorreu um erro interno.');
+
+            jsonResponse([
+                'success' => false,
+                'message' => $message,
+                'detalhes' => $detalhes
+            ], 500);
+        }
     }
 }
