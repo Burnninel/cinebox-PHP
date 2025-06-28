@@ -11,7 +11,7 @@ class Filme
     public $total_avaliacoes;
     public $media_avaliacoes;
 
-    public function query($database, $where = '', $params = [])
+    public function queryFilmes($database, $where = '', $params = [])
     {
         $sql = "
             SELECT 
@@ -37,19 +37,19 @@ class Filme
         );
     }
 
-    public static function getFilmePorId($database, $id)
+    public static function buscarFilmePorId($database, $id)
     {
-        return (new self)->query(
+        return (new self)->queryFilmes(
             $database,
             where: 'f.id = :id',
             params: ['id' => $id]
         )->fetch() ?: null;
     }
 
-    public static function getFilmes($database, $pesquisar)
+    public static function buscarFilmes($database, $pesquisar)
     {
         if (!$pesquisar) {
-            return (new self)->query($database)->fetchAll();
+            return (new self)->queryFilmes($database)->fetchAll();
         }
 
         $where = 'LOWER(f.titulo) LIKE :pesquisar 
@@ -58,10 +58,10 @@ class Filme
 
         $params = ['pesquisar' => "%$pesquisar%"];
 
-        return (new self)->query($database, $where, $params)->fetchAll();
+        return (new self)->queryFilmes($database, $where, $params)->fetchAll();
     }
 
-    public static function getFilmesPorUsuario($database, $usuarioId)
+    public static function buscarFilmesPorUsuario($database, $usuarioId)
     {
         $where = "f.id IN (
                 SELECT uf.filme_id 
@@ -71,10 +71,10 @@ class Filme
 
         $params = ['usuario_id' => $usuarioId];
 
-        return (new self)->query($database, $where, $params)->fetchAll();
+        return (new self)->queryFilmes($database, $where, $params)->fetchAll();
     }
 
-    public static function incluirNovoFilme($database, $dados, $usuario_id)
+    public static function criarFilme($database, $dados, $usuario_id)
     {
         $database->query(
             "INSERT INTO filmes (titulo, diretor, ano_de_lancamento, sinopse, categoria)
@@ -95,7 +95,7 @@ class Filme
         return $filme_id;
     }
 
-    public static function verificarFavoritado($database, $dados)
+    public static function verificarFilmeFavoritado($database, $dados)
     {
         return $database->query(
             "SELECT * FROM usuarios_filmes WHERE usuario_id = :usuario_id AND filme_id = :filme_id",
@@ -103,7 +103,7 @@ class Filme
         )->fetch();
     }
 
-    public static function favoritar($database, $dados)
+    public static function favoritarFilme($database, $dados)
     {
         return $database->query(
             "INSERT INTO usuarios_filmes (usuario_id, filme_id) VALUES (:usuario_id, :filme_id)",
@@ -111,7 +111,7 @@ class Filme
         );
     }
 
-    public static function desfavoritar($database, $dados)
+    public static function desfavoritarFilme($database, $dados)
     {
         $stmt = $database->query(
             "DELETE FROM usuarios_filmes WHERE usuario_id = :usuario_id AND filme_id = :filme_id",

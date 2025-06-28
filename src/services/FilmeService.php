@@ -12,17 +12,17 @@ class FilmeService
 
     public function buscarFilmes($pesquisar)
     {
-        return Filme::getFilmes($this->database, $pesquisar);
+        return Filme::buscarFilmes($this->database, $pesquisar);
     }
 
     public function buscarFilmePorId($id)
     {
-        return Filme::getFilmePorId($this->database, $id);
+        return Filme::buscarFilmePorId($this->database, $id);
     }
 
     public function buscarFilmesUsuario($usuario_id)
     {
-        return Filme::getFilmesPorUsuario($this->database, $usuario_id);
+        return Filme::buscarFilmesPorUsuario($this->database, $usuario_id);
     }
 
     public function validarDados($dados)
@@ -44,12 +44,12 @@ class FilmeService
 
     public function criarFilme($dados, $usuario_id)
     {
-        return Filme::incluirNovoFilme($this->database, $dados, $usuario_id);
+        return Filme::criarFilme($this->database, $dados, $usuario_id);
     }
 
     public function verificarFilmeFavoritado($dados)
     {
-        return Filme::verificarFavoritado($this->database, $dados);
+        return Filme::verificarFilmeFavoritado($this->database, $dados);
     }
 
     public function favoritarFilme($dados)
@@ -58,7 +58,7 @@ class FilmeService
             return false;
         }
 
-        return Filme::favoritar($this->database, $dados);
+        return Filme::favoritarFilme($this->database, $dados);
     }
 
     public function obterStatusFilmeParaUsuario($filme_id, $usuario_id)
@@ -68,7 +68,7 @@ class FilmeService
             'usuario_id' => $usuario_id
         ];
 
-        $filme = Filme::getFilmePorId($this->database, $filme_id);
+        $filme = Filme::buscarFilmePorId($this->database, $filme_id);
 
         if (!$filme) {
             return [
@@ -77,7 +77,7 @@ class FilmeService
             ];
         }
 
-        $favoritado = Filme::verificarFavoritado($this->database, $dados);
+        $favoritado = Filme::verificarFilmeFavoritado($this->database, $dados);
 
         return [
             'valido' => true,
@@ -93,6 +93,6 @@ class FilmeService
             return false;
         }
 
-        return Filme::desfavoritar($this->database, $dados);
+        return Filme::desfavoritarFilme($this->database, $dados);
     }
 }

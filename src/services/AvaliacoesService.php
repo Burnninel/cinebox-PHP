@@ -19,7 +19,7 @@ class AvaliacoesService
     public function buscarFilmePorId($id)
     {
         if ($this->idInvalido($id)) return false;
-        return Filme::getFilmePorId($this->database, $id);
+        return Filme::buscarFilmePorId($this->database, $id);
     }
 
     public function validarDados($dados)
