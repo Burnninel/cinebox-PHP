@@ -23,7 +23,7 @@ class AuthController extends BaseController
             $usuario = $this->authService->registrar($dados);
 
             if (!$usuario) {
-                jsonResponse(['status' => true, 'message' => 'Não foi possivel registrar o usuario.'], 422);
+                jsonResponse(['status' => false, 'message' => 'Não foi possivel registrar o usuario.'], 422);
             }
 
             jsonResponse(['status' => true, 'message' => 'Usuário cadastrado com sucesso!']);
