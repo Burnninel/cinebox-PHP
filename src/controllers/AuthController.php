@@ -57,6 +57,8 @@ class AuthController extends BaseController
                 'email' => $usuario->email
             ];
 
+            session_regenerate_id(true);
+
             jsonResponse([
                 'status' => true,
                 'message' => 'Usuário autenticado com sucesso.',
