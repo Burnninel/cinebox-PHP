@@ -3,20 +3,22 @@
 namespace Services;
 
 use Core\BaseService;
+use Core\Database;
 use Utils\Validacao;
 use Models\Filme;
+use PDOStatement;
+
 
 class FilmeService extends BaseService
 {
-    protected $database;
-    protected $validacao;
+    protected Database $database;
 
-    public function __construct($database)
+    public function __construct(Database $database)
     {
         $this->database = $database;
     }
 
-    public function buscarFilmes($pesquisar)
+    public function buscarFilmes(string $pesquisar): array|false
     {
         return $this->safe(
             fn() => Filme::buscarFilmes($this->database, $pesquisar),
@@ -24,7 +26,7 @@ class FilmeService extends BaseService
         );
     }
 
-    public function buscarFilmePorId($id)
+    public function buscarFilmePorId(int $id):  array|false
     {
         return $this->safe(
             fn() => Filme::buscarFilmePorId($this->database, $id),
@@ -32,7 +34,7 @@ class FilmeService extends BaseService
         );
     }
 
-    public function buscarFilmesUsuario($usuario_id)
+    public function buscarFilmesUsuario(int $usuario_id): array|false
     {
         return $this->safe(
             fn() => Filme::buscarFilmesPorUsuario($this->database, $usuario_id),
@@ -40,7 +42,7 @@ class FilmeService extends BaseService
         );
     }
 
-    public function validarDados($dados)
+    public function validarDados(array $dados): array
     {
         $regras = [
             'titulo' => ['required', 'min:3', 'unique:filmes'],
@@ -52,20 +54,22 @@ class FilmeService extends BaseService
             ]
         ];
 
-        $validador = $this->validacao = Validacao::validarCampos($regras, $dados, $this->database);
+        $validador = Validacao::validarCampos($regras, $dados, $this->database);
 
         return $validador->erros();
     }
 
-    public function criarFilme($dados, $usuario_id)
+    public function criarFilme(array $dados, int $usuario_id): bool
     {
-        return $this->safe(
+        $filmeId = $this->safe(
             fn() => Filme::criarFilme($this->database, $dados, $usuario_id),
             'Erro ao incluir filme no banco de dados.'
         );
+
+        return !empty($filmeId);
     }
 
-    public function verificarFilmeFavoritado($dados)
+    public function verificarFilmeFavoritado(array $dados): bool
     {
         return $this->safe(
             fn() => Filme::verificarFilmeFavoritado($this->database, $dados),
@@ -73,19 +77,21 @@ class FilmeService extends BaseService
         );
     }
 
-    public function favoritarFilme($dados)
+    public function favoritarFilme(array $dados): bool
     {
         if (!isset($dados['filme_id'], $dados['usuario_id']) || !is_numeric($dados['filme_id'])) {
             return false;
         }
 
-        return $this->safe(
+        $stmt = $this->safe(
             fn() => Filme::favoritarFilme($this->database, $dados),
             'Erro ao registrar filme favorito no banco de dados.'
         );
+
+        return $stmt !== false;
     }
 
-    public function obterStatusFilmeParaUsuario($filme_id, $usuario_id)
+    public function obterStatusFilmeParaUsuario(int $filme_id, int $usuario_id): array
     {
         $dados = [
             'filme_id' => $filme_id,
@@ -117,15 +123,17 @@ class FilmeService extends BaseService
         ];
     }
 
-    public function desfavoritarFilme($dados)
+    public function desfavoritarFilme(array $dados): bool
     {
         if (!isset($dados['filme_id'], $dados['usuario_id']) || !is_numeric($dados['filme_id'])) {
             return false;
         }
 
-        return $this->safe(
+        $stmt = $this->safe(
             fn() => Filme::desfavoritarFilme($this->database, $dados),
             'Erro ao remover filme dos favoritos no banco de dados.'
         );
+
+        return $stmt !== false;
     }
 }

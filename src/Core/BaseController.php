@@ -4,7 +4,7 @@ namespace Core;
 
 class BaseController
 {
-    protected function safe($callback)
+    protected function safe(callable $callback): mixed
     {
         try {
             return $callback();
@@ -21,5 +21,7 @@ class BaseController
                 'detalhes' => $e->getMessage()
             ], 500);
         }
+
+        return null;
     }
 }

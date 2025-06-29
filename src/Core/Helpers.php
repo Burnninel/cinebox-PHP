@@ -1,6 +1,6 @@
 <?php
 
-function dd($data)
+function dd($data): never
 {
     echo '<pre>';
     var_dump($data);
@@ -8,7 +8,7 @@ function dd($data)
     die();
 }
 
-function config($chave = null)
+function config(?string $chave = null): mixed
 {
     $config = require __DIR__ . '/../../config/config.php';
 
@@ -19,7 +19,7 @@ function config($chave = null)
     return $config;
 }
 
-function auth()
+function auth(): object|false
 {
     if (!isset($_SESSION['auth'])) {
         return false;
@@ -28,7 +28,7 @@ function auth()
     return (object) $_SESSION['auth'];
 }
 
-function requireAuthenticatedUser()
+function requireAuthenticatedUser(): object
 {
     $usuario = auth();
 
@@ -41,7 +41,7 @@ function requireAuthenticatedUser()
     return $usuario;
 }
 
-function getRequestData()
+function getRequestData(): array
 {
     $dados = json_decode(file_get_contents('php://input'), true) ?: [];
 
@@ -52,7 +52,7 @@ function getRequestData()
     return $dados;
 }
 
-function jsonResponse($dados, $status = 200)
+function jsonResponse(array $dados, int $status = 200): never
 {
     http_response_code($status);
     echo json_encode($dados);

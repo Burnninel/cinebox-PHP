@@ -3,6 +3,7 @@
 namespace Controllers;
 
 use Core\BaseController;
+use Core\Database;
 use Services\FilmeService;
 use Services\AvaliacaoService;
 
@@ -11,15 +12,15 @@ class FilmeController extends BaseController
     private FilmeService $filmeService;
     private AvaliacaoService $avaliacaoService;
 
-    public function __construct($database)
+    public function __construct(Database $database)
     {
         $this->filmeService = new FilmeService($database);
         $this->avaliacaoService = new AvaliacaoService($database);
     }
 
-    public function index()
+    public function index(): void
     {
-        $this->safe(function () {
+        $this->safe(function (): void {
             $pesquisar = trim($_GET['pesquisar'] ?? '');
 
             $filmes = $this->filmeService->buscarFilmes($pesquisar);
@@ -32,9 +33,9 @@ class FilmeController extends BaseController
         });
     }
 
-    public function show($id)
+    public function show(int $id): void
     {
-        $this->safe(function () use ($id) {
+        $this->safe(function () use ($id): void {
             $filme = $this->filmeService->buscarFilmePorId($id);
 
             if (!$filme) {
@@ -54,9 +55,9 @@ class FilmeController extends BaseController
         });
     }
 
-    public function meusFilmes()
+    public function meusFilmes(): void
     {
-        $this->safe(function () {
+        $this->safe(function (): void {
             $usuario = requireAuthenticatedUser();
 
             $filmes = $this->filmeService->buscarFilmesUsuario($usuario->id);
@@ -77,9 +78,9 @@ class FilmeController extends BaseController
         });
     }
 
-    public function store()
+    public function store(): void
     {
-        $this->safe(function () {
+        $this->safe(function (): void {
             $dados = getRequestData();
 
             $usuario = requireAuthenticatedUser();
@@ -100,9 +101,9 @@ class FilmeController extends BaseController
         });
     }
 
-    public function favoritarFilme($id)
+    public function favoritarFilme(int $id): void
     {
-        $this->safe(function ()  use ($id) {
+        $this->safe(function ()  use ($id): void {
             $usuario = requireAuthenticatedUser();
 
             $resultado = $this->filmeService->obterStatusFilmeParaUsuario($id, $usuario->id);
@@ -125,9 +126,9 @@ class FilmeController extends BaseController
         });
     }
 
-    public function desfavoritarFilme($id)
+    public function desfavoritarFilme(int $id): void
     {
-        $this->safe(function ()  use ($id) {
+        $this->safe(function ()  use ($id): void {
             $usuario = requireAuthenticatedUser();
 
             $resultado = $this->filmeService->obterStatusFilmeParaUsuario($id, $usuario->id);

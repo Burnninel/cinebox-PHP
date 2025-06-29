@@ -2,30 +2,33 @@
 
 namespace Models;
 
+use Core\Database;
+use PDOStatement;
+
 class Usuario
 {
-    public $id;
-    public $nome;
-    public $email;
-    public $senha;
+    public int $id;
+    public string $nome;
+    public string $email;
+    public string $senha;
 
-    public static function buscarUsuarioCredenciais($database, $email)
+    public static function buscarUsuarioCredenciais(Database $database, string $email): ?self
     {
         $usuario = $database->query(
             query: "SELECT * FROM usuarios WHERE email = :email",
-            class: Usuario::class,
+            class: self::class,
             params: compact('email')
         )->fetch();
 
         return $usuario ?: null;
     }
 
-    public function verificarSenha($senha)
+    public function verificarSenha(string $senha): bool
     {
         return password_verify($senha, $this->senha);
     }
 
-    public static function cadastrarUsuario($database, $dados)
+    public static function cadastrarUsuario(Database $database, array $dados): PDOStatement
     {
         return $database->query(
             "INSERT INTO usuarios (nome, email, senha) VALUES (:nome, :email, :senha)",
@@ -33,7 +36,7 @@ class Usuario
         );
     }
 
-    public static function hashSenha($senha)
+    public static function hashSenha(string $senha): string|false
     {
         return password_hash($senha, PASSWORD_BCRYPT);
     }

@@ -3,20 +3,20 @@
 namespace Services;
 
 use Core\BaseService;
+use Core\Database;
 use Utils\Validacao;
 use Models\Usuario;
 
 class AuthService extends BaseService
 {
-    protected $database;
-    protected $validacao;
+    protected Database $database;
 
-    public function __construct($database)
+    public function __construct(Database $database)
     {
         $this->database = $database;
     }
 
-    public function validarLogin($dados)
+    public function validarLogin(array $dados): array
     {
         $regras = [
             'email' => ['required', 'email'],
@@ -31,7 +31,7 @@ class AuthService extends BaseService
         return $validador->erros();
     }
 
-    public function validarRegistro($dados)
+    public function validarRegistro(array $dados): array
     {
         $regras = [
             'nome' => ['required', 'string', 'min:5'],
@@ -47,7 +47,7 @@ class AuthService extends BaseService
         return $validador->erros();
     }
 
-    public function autenticar($email, $senha)
+    public function autenticar(string $email, string $senha): ?Usuario
     {
         $usuario = $this->safe(
             fn() => Usuario::buscarUsuarioCredenciais($this->database, $email),
@@ -56,7 +56,7 @@ class AuthService extends BaseService
         return $usuario && $usuario->verificarSenha($senha) ? $usuario : null;
     }
 
-    public function registrar($dados)
+    public function registrar(array $dados): bool
     {
         $dadosFiltrados = [
             'nome' => $dados['nome'] ?? '',
@@ -64,9 +64,11 @@ class AuthService extends BaseService
             'senha' => Usuario::hashSenha($dados['senha'] ?? '')
         ];
 
-        return $this->safe(
+        $stmt = $this->safe(
             fn() => Usuario::cadastrarUsuario($this->database, $dadosFiltrados),
             'Erro ao inserir usuario no banco de dados.'
         );
+
+        return $stmt->rowCount() > 0;
     }
 }

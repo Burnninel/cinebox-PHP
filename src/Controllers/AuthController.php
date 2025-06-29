@@ -3,20 +3,22 @@
 namespace Controllers;
 
 use Core\BaseController;
+use Core\Database;
+
 use Services\AuthService;
 
 class AuthController extends BaseController
 {
     private AuthService $authService;
 
-    public function __construct($database)
+    public function __construct(Database $database)
     {
         $this->authService = new AuthService($database);
     }
 
-    public function store()
+    public function store(): void
     {
-        $this->safe(function () {
+        $this->safe(function (): void {
             $dados = getRequestData();
 
             $erros = $this->authService->validarRegistro($dados);
@@ -35,9 +37,9 @@ class AuthController extends BaseController
         });
     }
 
-    public function login()
+    public function login(): void
     {
-        $this->safe(function () {
+        $this->safe(function (): void {
             $dados = getRequestData();
 
             $erros = $this->authService->validarLogin($dados);
@@ -70,7 +72,7 @@ class AuthController extends BaseController
         });
     }
 
-    public function logout()
+    public function logout(): void
     {
         unset($_SESSION['auth']);
         jsonResponse(['status' => true, 'message' => 'Usuário desconectado com sucesso.']);

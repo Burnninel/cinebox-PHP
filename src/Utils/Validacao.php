@@ -2,16 +2,18 @@
 
 namespace Utils;
 
+use Core\Database;
+
 class Validacao
 {
-    private $erros = [];
+    private array $erros = [];
 
-    private static $colunasPermitidas = [
+    private static array $colunasPermitidas = [
         'usuarios' => ['email'],
         'filmes' => ['titulo']
     ];
 
-    public static function validarCampos($regrasValidacao, $camposForm, $database)
+    public static function validarCampos(array $regrasValidacao, array $camposForm, Database $database): self
     {
         $validacao = new self;
         $validacaoBanco = [];
@@ -53,28 +55,28 @@ class Validacao
         return $validacao;
     }
 
-    private function required($campo, $valor)
+    private function required(string $campo, mixed $valor): void
     {
         if (empty($valor)) {
             $this->erros[] = [$campo, "Campo é obrigatório."];
         }
     }
 
-    private function email($campo, $valor)
+    private function email(string $campo, mixed $valor): void
     {
         if (!filter_var($valor, FILTER_VALIDATE_EMAIL)) {
             $this->erros[] = [$campo, "Formato de e-mail inválido."];
         }
     }
 
-    private function confirmed($campo, $valor, $confirmacao)
+    private function confirmed(string $campo, mixed $valor, mixed $confirmacao): void
     {
         if ($valor !== $confirmacao) {
             $this->erros[] = [$campo, "Valor e confirmação não correspondem."];
         }
     }
 
-    private function unique($campo, $valor, $tabela, $database)
+    private function unique(string $campo, mixed $valor, string $tabela, Database $database): void
     {
         $emailExiste = $database->query(
             query: "SELECT * FROM $tabela WHERE $campo = :valor",
@@ -86,58 +88,59 @@ class Validacao
         }
     }
 
-    private function min($campo, $valor, $min)
+    private function min(string $campo, mixed $valor, mixed $min): void
     {
         if (strlen((string)$valor) < (int)$min) {
             $this->erros[] = [$campo, "Mínimo de $min caracteres."];
         }
     }
 
-    private function max($campo, $valor, $max)
+    private function max(string $campo, mixed $valor, mixed $max): void
     {
         if (strlen((string)$valor) > (int)$max) {
             $this->erros[] = [$campo, "Máximo de $max caracteres."];
         }
     }
 
-    private function strong($campo, $valor)
+    private function strong(string $campo, mixed $valor): void
     {
         if (!$valor || !strpbrk($valor, '!@#$%¨&*()_.-[/];|?')) {
             $this->erros[] = [$campo, "Deve conter ao menos um caractere especial."];
         }
     }
 
-    private function string($campo, $valor)
+    private function string(string $campo, mixed $valor): void
     {
         if (!$valor || !preg_match('/^[a-zA-ZÀ-ÿ\s\.-]+$/u', $valor)) {
             $this->erros[] = [$campo, "Contém caracteres inválidos."];
         }
     }
 
-    private function numeric($campo, $valor)
+    private function numeric(string $campo, mixed $valor): void
     {
         if (!is_numeric($valor)) {
             $this->erros[] = [$campo, "Deve ser um valor numérico."];
         }
     }
 
-    private function between($campo, $valor, $between)
+    private function between(string $campo, mixed $valor, string $between): void
     {
         [$min, $max] = array_pad(explode('-', $between, 2), 2, null);
 
         if ($valor < $min || $valor > $max) {
             $this->erros[] = [$campo, "Deve estar entre $min e $max."];
+            return;
         }
     }
 
-    private function length($campo, $valor, $length)
+    private function length(string $campo, mixed $valor, int $length): void
     {
-        if (strlen($valor) != $length) {
+        if (strlen((string) $valor) != $length) {
             $this->erros[] = [$campo, "Deve conter exatamente $length dígitos."];
         }
     }
 
-    public function erros()
+    public function erros(): array
     {
         $resultado = [];
 

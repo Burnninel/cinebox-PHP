@@ -2,10 +2,8 @@
 
 namespace Core;
 
-use Models\Usuario;
-
 Class BaseService {
-    protected function safe($callback, $errorMessage)
+    protected function safe(callable $callback, string $errorMessage): mixed
     {
         try {
             return $callback();

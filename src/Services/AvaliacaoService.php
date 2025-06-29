@@ -3,27 +3,26 @@
 namespace Services;
 
 use Core\BaseService;
+use Core\Database;
 use Utils\Validacao;
 use Models\Filme;
 use Models\Avaliacao;
 
 class AvaliacaoService extends BaseService
 {
-    protected $database;
-    protected $validacao;
-    protected $avaliacao;
+    protected Database $database;
 
-    public function __construct($database)
+    public function __construct(Database $database)
     {
         $this->database = $database;
     }
 
-    private function idInvalido($id)
+    private function idInvalido(int $id): bool
     {
-        return !isset($id) || !is_numeric($id);
+        return $id <= 0;
     }
 
-    public function buscarFilmePorId($id)
+    public function buscarFilmePorId(int $id): bool|array
     {
         if ($this->idInvalido($id)) return false;
 
@@ -33,7 +32,7 @@ class AvaliacaoService extends BaseService
         );
     }
 
-    public function validarDados($dados)
+    public function validarDados(array $dados): array
     {
         $regras = [
             'nota' => ['required', 'numeric', 'between:1-5', 'length:1'],
@@ -45,13 +44,13 @@ class AvaliacaoService extends BaseService
         return $validador->erros();
     }
 
-    public function criarAvaliacao($dados, $id, $usuario)
+    public function criarAvaliacao(array $dados, int $id, int $usuario_id): bool|\PDOStatement
     {
         if ($this->idInvalido($id)) return false;
 
         $dados += [
             'filme_id' => $id,
-            'usuario_id' => $usuario
+            'usuario_id' => $usuario_id
         ];
 
         return $this->safe(
@@ -60,7 +59,7 @@ class AvaliacaoService extends BaseService
         );
     }
 
-    public function listarAvaliacoes($id)
+    public function listarAvaliacoes(int $id): bool|array
     {
         if ($this->idInvalido($id)) return false;
 
@@ -70,17 +69,17 @@ class AvaliacaoService extends BaseService
         );
     }
 
-    public function buscarAvaliacaoUsuarioFilme($id, $usuario)
+    public function buscarAvaliacaoUsuarioFilme(int $id, int $usuario_id): bool|Avaliacao|null
     {
         if ($this->idInvalido($id)) return false;
 
         return $this->safe(
-            fn() => Avaliacao::buscarAvaliacaoUsuarioFilme($this->database, $id, $usuario),
+            fn() => Avaliacao::buscarAvaliacaoUsuarioFilme($this->database, $id, $usuario_id),
             'Erro ao consultar avaliacoes do usuario no banco de dados.'
         );
     }
 
-    public function buscarAvaliacaoPorId($id)
+    public function buscarAvaliacaoPorId(int $id): bool|Avaliacao|null
     {
         if ($this->idInvalido($id)) return false;
 
@@ -90,7 +89,7 @@ class AvaliacaoService extends BaseService
         );
     }
 
-    public function excluirAvaliacao($dados)
+    public function excluirAvaliacao(array $dados): bool
     {
         return $this->safe(
             fn() => Avaliacao::removerAvaliacao($this->database, $dados),

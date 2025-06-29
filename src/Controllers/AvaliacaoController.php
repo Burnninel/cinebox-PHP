@@ -3,20 +3,21 @@
 namespace Controllers;
 
 use Core\BaseController;
+use Core\Database;
 use Services\AvaliacaoService;
 
 class AvaliacaoController extends BaseController
 {
     private AvaliacaoService $avaliacaoService;
 
-    public function __construct($database)
+    public function __construct(Database $database)
     {
         $this->avaliacaoService = new AvaliacaoService($database);
     }
 
-    public function store($id)
+    public function store(int $id): void
     {
-        $this->safe(function () use ($id) {
+        $this->safe(function () use ($id): void {
             $dados = getRequestData();
 
             $usuario = requireAuthenticatedUser();
@@ -45,9 +46,9 @@ class AvaliacaoController extends BaseController
         });
     }
 
-    public function destroy($id)
+    public function destroy(int $id): void
     {
-        $this->safe(function () use ($id) {
+        $this->safe(function () use ($id): void {
             $usuario = requireAuthenticatedUser();
 
             $dados = [

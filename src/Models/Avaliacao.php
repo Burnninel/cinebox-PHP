@@ -2,16 +2,19 @@
 
 namespace Models;
 
+use Core\Database;
+use PDOStatement;
+
 class Avaliacao
 {
-    public $id;
-    public $filme_id;
-    public $usuario_id;
-    public $usuario;
-    public $comentario;
-    public $nota;
+    public int $id;
+    public int $filme_id;
+    public int $usuario_id;
+    public string $usuario;
+    public string $comentario;
+    public int $nota;
 
-    public static function queryFilmeAvaliacao($database, $where, $params = [])
+    public static function queryFilmeAvaliacao(Database $database, string $where, array $params = []): PDOStatement
     {
         $sql = "
             SELECT 
@@ -37,7 +40,8 @@ class Avaliacao
         );
     }
 
-    public static function buscarAvaliacoesFilme($database, $filme_id) {
+    public static function buscarAvaliacoesFilme(Database $database, int $filme_id): array
+    {
          return self::queryFilmeAvaliacao(
             $database,
             where: 'f.id = :filme_id',
@@ -45,8 +49,9 @@ class Avaliacao
         )->fetchAll();
     }
 
-    public static function buscarAvaliacaoUsuarioFilme($database, $filme_id, $usuario_id) {
-         $avaliacao = self::queryFilmeAvaliacao(
+    public static function buscarAvaliacaoUsuarioFilme(Database $database, int $filme_id, int $usuario_id): ?Avaliacao
+    {
+        $avaliacao = self::queryFilmeAvaliacao(
             $database,
             where: 'a.filme_id = :filme_id AND a.usuario_id = :usuario_id',
             params: ['filme_id' => $filme_id, 'usuario_id' => $usuario_id]
@@ -55,7 +60,7 @@ class Avaliacao
         return $avaliacao ?: null;
     }
 
-    public static function criarAvaliacao($database, $dados)
+    public static function criarAvaliacao(Database $database, array $dados): PDOStatement
     {
         return $database->query(
             "INSERT INTO avaliacoes (usuario_id, filme_id, nota, comentario)
@@ -64,7 +69,7 @@ class Avaliacao
         );
     }
 
-    public static function buscarAvaliacao($database, $id)
+    public static function buscarAvaliacao(Database $database, int $id): ?Avaliacao
     {
         $avaliacao = $database->query(
             "SELECT * FROM avaliacoes WHERE id = :id",
@@ -74,7 +79,7 @@ class Avaliacao
         return $avaliacao ?: null;
     }
 
-    public static function removerAvaliacao($database, $dados)
+    public static function removerAvaliacao(Database $database, array $dados): bool
     {
         $stmt = $database->query(
             "DELETE FROM avaliacoes WHERE id = :id AND usuario_id = :usuario_id;",

@@ -4,7 +4,7 @@ namespace Core;
 
 class AppException extends \Exception 
 {
-    protected $detalhesDb;
+    protected string $detalhesDb;
 
     public function __construct(string $mensagem, string $detalhesDb = '', int $codigo = 500)
     {
