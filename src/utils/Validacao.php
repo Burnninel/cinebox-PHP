@@ -1,5 +1,7 @@
 <?php
 
+namespace Utils;
+
 class Validacao
 {
     private $erros = [];
@@ -22,7 +24,7 @@ class Validacao
                 [$nomeRegra, $parametro] = array_pad(explode(':', $regra, 2), 2, null);
 
                 if (!method_exists($validacao, $nomeRegra)) {
-                    throw new Exception("Regra de validação '$regra' não existe.");
+                    throw new \Exception("Regra de validação '$regra' não existe.");
                 }
 
                 if ($nomeRegra === 'confirmed') {
@@ -32,7 +34,7 @@ class Validacao
 
                 if ($nomeRegra === 'unique') {
                     if (!in_array($campo, self::$colunasPermitidas[$parametro] ?? [], true)) {
-                        throw new Exception("Campo '$campo' ou tabela '$parametro' não são aceitos ou estão inválidos.");
+                        throw new \Exception("Campo '$campo' ou tabela '$parametro' não são aceitos ou estão inválidos.");
                     }
                     $validacaoBanco[] = [$campo, $valor, $nomeRegra, $parametro];
                     continue;
@@ -54,21 +56,21 @@ class Validacao
     private function required($campo, $valor)
     {
         if (empty($valor)) {
-            $this->erros[] = [$campo, "$campo é obrigatório"];
+            $this->erros[] = [$campo, "Campo é obrigatório."];
         }
     }
 
     private function email($campo, $valor)
     {
         if (!filter_var($valor, FILTER_VALIDATE_EMAIL)) {
-            $this->erros[] = [$campo, "$campo é inválido"];
+            $this->erros[] = [$campo, "Formato de e-mail inválido."];
         }
     }
 
     private function confirmed($campo, $valor, $confirmacao)
     {
         if ($valor !== $confirmacao) {
-            $this->erros[] = [$campo, "$campo e confirmação não coincidem"];
+            $this->erros[] = [$campo, "Valor e confirmação não correspondem."];
         }
     }
 
@@ -80,42 +82,42 @@ class Validacao
         )->fetch();
 
         if ($emailExiste) {
-            $this->erros[] = [$campo, "$campo já está em uso"];
+            $this->erros[] = [$campo, "Já está em uso."];
         }
     }
 
     private function min($campo, $valor, $min)
     {
         if (strlen((string)$valor) < (int)$min) {
-            $this->erros[] = [$campo, "$campo precisa ter no minimo $min caracteres"];
+            $this->erros[] = [$campo, "Mínimo de $min caracteres."];
         }
     }
 
     private function max($campo, $valor, $max)
     {
         if (strlen((string)$valor) > (int)$max) {
-            $this->erros[] = [$campo, "$campo precisa ter no máximo $max caracteres"];
+            $this->erros[] = [$campo, "Máximo de $max caracteres."];
         }
     }
 
     private function strong($campo, $valor)
     {
         if (!$valor || !strpbrk($valor, '!@#$%¨&*()_.-[/];|?')) {
-            $this->erros[] = [$campo, "$campo precisa ter um caracter especial"];
+            $this->erros[] = [$campo, "Deve conter ao menos um caractere especial."];
         }
     }
 
     private function string($campo, $valor)
     {
         if (!$valor || !preg_match('/^[a-zA-ZÀ-ÿ\s\.-]+$/u', $valor)) {
-            $this->erros[] = [$campo, "Caracteres inválidos para o campo $campo"];
+            $this->erros[] = [$campo, "Contém caracteres inválidos."];
         }
     }
 
     private function numeric($campo, $valor)
     {
         if (!is_numeric($valor)) {
-            $this->erros[] = [$campo, "O campo $campo precisa ser númerico"];
+            $this->erros[] = [$campo, "Deve ser um valor numérico."];
         }
     }
 
@@ -124,14 +126,14 @@ class Validacao
         [$min, $max] = array_pad(explode('-', $between, 2), 2, null);
 
         if ($valor < $min || $valor > $max) {
-            $this->erros[] = [$campo, "O campo $campo deve estar entre $min e $max."];
+            $this->erros[] = [$campo, "Deve estar entre $min e $max."];
         }
     }
 
     private function length($campo, $valor, $length)
     {
         if (strlen($valor) != $length) {
-            $this->erros[] = [$campo, "O campo $campo precisa ter $length dígitos."];
+            $this->erros[] = [$campo, "Deve conter exatamente $length dígitos."];
         }
     }
 

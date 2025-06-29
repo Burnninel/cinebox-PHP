@@ -1,5 +1,11 @@
 <?php
 
+namespace Services;
+
+use Core\BaseService;
+use Utils\Validacao;
+use Models\Usuario;
+
 class AuthService extends BaseService
 {
     protected $database;

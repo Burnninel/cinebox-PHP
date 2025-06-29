@@ -1,5 +1,7 @@
 <?php
 
+namespace Models;
+
 class Filme
 {
     public $id;

@@ -1,5 +1,12 @@
 <?php
 
+namespace Services;
+
+use Core\BaseService;
+use Utils\Validacao;
+use Models\Filme;
+use Models\Avaliacao;
+
 class AvaliacaoService extends BaseService
 {
     protected $database;

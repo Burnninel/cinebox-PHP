@@ -1,8 +1,13 @@
 <?php
 
+namespace Controllers;
+
+use Core\BaseController;
+use Services\AuthService;
+
 class AuthController extends BaseController
 {
-    private $authService;
+    private AuthService $authService;
 
     public function __construct($database)
     {
@@ -56,8 +61,6 @@ class AuthController extends BaseController
                 'nome' => $usuario->nome,
                 'email' => $usuario->email
             ];
-
-            session_regenerate_id(true);
 
             jsonResponse([
                 'status' => true,

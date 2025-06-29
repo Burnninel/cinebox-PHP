@@ -1,8 +1,13 @@
 <?php
 
+namespace Controllers;
+
+use Core\BaseController;
+use Services\AvaliacaoService;
+
 class AvaliacaoController extends BaseController
 {
-    private $avaliacaoService;
+    private AvaliacaoService $avaliacaoService;
 
     public function __construct($database)
     {

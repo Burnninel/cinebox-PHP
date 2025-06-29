@@ -1,9 +1,15 @@
 <?php
 
+namespace Controllers;
+
+use Core\BaseController;
+use Services\FilmeService;
+use Services\AvaliacaoService;
+
 class FilmeController extends BaseController
 {
-    private $filmeService;
-    private $avaliacaoService;
+    private FilmeService $filmeService;
+    private AvaliacaoService $avaliacaoService;
 
     public function __construct($database)
     {

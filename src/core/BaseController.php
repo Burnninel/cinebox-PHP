@@ -1,5 +1,7 @@
 <?php
 
+namespace Core;
+
 class BaseController
 {
     protected function safe($callback)
@@ -12,7 +14,7 @@ class BaseController
                 'message' => $e->getMessage(),
                 'detalhes' => $e->getDetalhes()
             ], 500);
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             jsonResponse([
                 'success' => false,
                 'message' => 'Erro interno do servidor.',

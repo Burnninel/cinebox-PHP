@@ -1,6 +1,8 @@
 <?php
 
-class AppException extends Exception 
+namespace Core;
+
+class AppException extends \Exception 
 {
     protected $detalhesDb;
 

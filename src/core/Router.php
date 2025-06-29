@@ -10,29 +10,33 @@ $segments = explode('/', $uri);
 $resource = $segments[0] ?? '';
 $param = $segments[1] ?? null;
 $action = $segments[2] ?? null;
-$method = $_SERVER['REQUEST_METHOD'];
 
 switch ($resource) {
     case 'login':
+        $controllerClass = 'Controllers\AuthController';
+        $controller = new $controllerClass($database);
         if ($method === 'POST') {
-            (new AuthController($database))->login();
+            (new $controllerClass($database))->login();
         }
         break;
 
     case 'registrar':
         if ($method === 'POST') {
-            (new AuthController($database))->store();
+            $controllerClass = 'Controllers\AuthController';
+            (new $controllerClass($database))->store();
         }
         break;
 
     case 'logout':
         if ($method === 'POST') {
-            (new AuthController($database))->logout();
+            $controllerClass = 'Controllers\AuthController';
+            (new $controllerClass($database))->logout();
         }
         break;
 
     case 'filme':
-        $controller = new FilmeController($database);
+        $controllerClass = 'Controllers\FilmeController';
+        $controller = new $controllerClass($database);
         switch ($method) {
             case 'GET':
                 if (!$param) {
@@ -57,7 +61,8 @@ switch ($resource) {
         break;
 
     case 'avaliacao':
-        $controller = new AvaliacaoController($database);
+        $controllerClass = 'Controllers\AvaliacaoController';
+        $controller = new $controllerClass($database);
         switch ($method) {
             case 'POST':
                 $controller->store($param);
