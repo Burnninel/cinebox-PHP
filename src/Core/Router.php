@@ -44,15 +44,15 @@ switch ($resource) {
                 } elseif ($param === 'meus-filmes') {
                     $controller->meusFilmes();
                 } else {
-                    $controller->show($param);
-                }
+                    $controller->show(ensureValidId($param));
+                } 
                 break;
 
             case 'POST':
                 if ($param && $action === 'favoritar') {
-                    $controller->favoritarFilme($param);
+                    $controller->favoritarFilme(ensureValidId($param));
                 } elseif ($param && $action === 'desfavoritar') {
-                    $controller->desfavoritarFilme($param);
+                    $controller->desfavoritarFilme(ensureValidId($param));
                 } else {
                     $controller->store();
                 }
@@ -65,10 +65,10 @@ switch ($resource) {
         $controller = new $controllerClass($database);
         switch ($method) {
             case 'POST':
-                $controller->store($param);
+                $controller->store(ensureValidId($param));
                 break;
             case 'DELETE':
-                $controller->destroy($param);
+                $controller->destroy(ensureValidId($param));
                 break;
         }
         break;

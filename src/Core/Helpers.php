@@ -58,3 +58,12 @@ function jsonResponse(array $dados, int $status = 200): never
     echo json_encode($dados);
     exit;
 }
+
+function ensureValidId(mixed $param): int
+{
+    if (!is_numeric($param) || (int)$param <= 0) {
+        jsonResponse(['status' => false, 'message' => 'ID inválido!'], 400);
+    }
+
+    return (int)$param;
+}
