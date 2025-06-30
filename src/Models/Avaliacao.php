@@ -69,7 +69,7 @@ class Avaliacao
         );
     }
 
-    public static function buscarAvaliacao(Database $database, int $id): ?Avaliacao
+    public static function buscarAvaliacao(Database $database, int $id): array|null
     {
         $avaliacao = $database->query(
             "SELECT * FROM avaliacoes WHERE id = :id",

@@ -27,8 +27,9 @@ class AvaliacaoController extends BaseController
                 jsonResponse(['success' => false, "message" => "Dados inválidos!", "errors" => $erros], 400);
             }
 
-            $filme = $this->avaliacaoService->buscarFilmePorId($id);
-            if (!$filme) {
+            $filme = $this->avaliacaoService->verificarFilmeExiste($id);
+
+            if ($filme === false) {
                 jsonResponse(['success' => false, "message" => "Filme não encontrado!"], 400);
             }
 

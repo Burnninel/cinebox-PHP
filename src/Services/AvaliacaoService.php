@@ -22,14 +22,16 @@ class AvaliacaoService extends BaseService
         return $id <= 0;
     }
 
-    public function buscarFilmePorId(int $id): bool|array
+    public function verificarFilmeExiste(int $id): bool
     {
         if ($this->idInvalido($id)) return false;
 
-        return $this->safe(
+        $resultado = $this->safe(
             fn() => Filme::buscarFilmePorId($this->database, $id),
             'Erro ao buscar filme no banco de dados.'
         );
+
+        return $resultado !== null;
     }
 
     public function validarDados(array $dados): array
@@ -79,9 +81,9 @@ class AvaliacaoService extends BaseService
         );
     }
 
-    public function buscarAvaliacaoPorId(int $id): bool|Avaliacao|null
+    public function buscarAvaliacaoPorId(int $id): ?array
     {
-        if ($this->idInvalido($id)) return false;
+        if ($this->idInvalido($id)) return null;
 
         return $this->safe(
             fn() => Avaliacao::buscarAvaliacao($this->database, $id),
