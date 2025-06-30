@@ -6,8 +6,6 @@ use Core\BaseService;
 use Core\Database;
 use Utils\Validacao;
 use Models\Filme;
-use PDOStatement;
-
 
 class FilmeService extends BaseService
 {
@@ -26,12 +24,14 @@ class FilmeService extends BaseService
         );
     }
 
-    public function buscarFilmePorId(int $id):  array|false
+    public function buscarFilmePorId(int $id):  ?filme
     {
-        return $this->safe(
+        $filme = $this->safe(
             fn() => Filme::buscarFilmePorId($this->database, $id),
             'Erro ao buscar filme no banco de dados.'
         );
+
+        return $filme ?: null;
     }
 
     public function buscarFilmesUsuario(int $usuario_id): array|false
@@ -67,14 +67,6 @@ class FilmeService extends BaseService
         );
 
         return !empty($filmeId);
-    }
-
-    public function verificarFilmeFavoritado(array $dados): bool
-    {
-        return $this->safe(
-            fn() => Filme::verificarFilmeFavoritado($this->database, $dados),
-            'Erro ao validar filmes favoritos no banco de dados.'
-        );
     }
 
     public function favoritarFilme(array $dados): bool

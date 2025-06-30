@@ -100,12 +100,14 @@ class Filme
         return $filme_id;
     }
 
-    public static function verificarFilmeFavoritado(Database $database, array $dados): ?self
+    public static function verificarFilmeFavoritado(Database $database, array $dados): bool
     {
-        return $database->query(
+        $resultado = $database->query(
             "SELECT * FROM usuarios_filmes WHERE usuario_id = :usuario_id AND filme_id = :filme_id",
             params: $dados
         )->fetch();
+
+        return $resultado !== false;
     }
 
     public static function favoritarFilme(Database $database, array $dados): PDOStatement
