@@ -1,0 +1,16 @@
+{
+    "name": "cinebox/app",
+    "autoload": {
+        "psr-4": {
+            "Cinebox\\App\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Burnninel",
+            "email": "brunoabc11@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {}
+}

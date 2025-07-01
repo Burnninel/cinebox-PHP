@@ -1,11 +1,11 @@
 <?php
 
-namespace Services;
+namespace Cinebox\App\Services;
 
-use Core\BaseService;
-use Core\Database;
-use Utils\Validacao;
-use Models\Filme;
+use Cinebox\App\Core\BaseService;
+use Cinebox\App\Core\Database;
+use Cinebox\App\Utils\Validacao;
+use Cinebox\App\Models\Filme;
 
 class FilmeService extends BaseService
 {

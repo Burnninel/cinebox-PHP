@@ -1,8 +1,8 @@
 <?php
 
-namespace Utils;
+namespace Cinebox\App\Utils;
 
-use Core\Database;
+use Cinebox\App\Core\Database;
 
 class Validacao
 {

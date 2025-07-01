@@ -1,10 +1,10 @@
 <?php
 
-namespace Controllers;
+namespace Cinebox\App\Controllers;
 
-use Core\BaseController;
-use Core\Database;
-use Services\AvaliacaoService;
+use Cinebox\App\Core\BaseController;
+use Cinebox\App\Core\Database;
+use Cinebox\App\Services\AvaliacaoService;
 
 class AvaliacaoController extends BaseController
 {

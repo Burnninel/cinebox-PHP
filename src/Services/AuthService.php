@@ -1,11 +1,11 @@
 <?php
 
-namespace Services;
+namespace Cinebox\App\Services;
 
-use Core\BaseService;
-use Core\Database;
-use Utils\Validacao;
-use Models\Usuario;
+use Cinebox\App\Core\BaseService;
+use Cinebox\App\Core\Database;
+use Cinebox\App\Utils\Validacao;
+use Cinebox\App\Models\Usuario;
 
 class AuthService extends BaseService
 {

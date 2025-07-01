@@ -13,7 +13,7 @@ $action = $segments[2] ?? null;
 
 switch ($resource) {
     case 'login':
-        $controllerClass = 'Controllers\AuthController';
+        $controllerClass = 'Cinebox\App\Controllers\AuthController';
         $controller = new $controllerClass($database);
         if ($method === 'POST') {
             (new $controllerClass($database))->login();
@@ -22,20 +22,20 @@ switch ($resource) {
 
     case 'registrar':
         if ($method === 'POST') {
-            $controllerClass = 'Controllers\AuthController';
+            $controllerClass = 'Cinebox\App\Controllers\AuthController';
             (new $controllerClass($database))->store();
         }
         break;
 
     case 'logout':
         if ($method === 'POST') {
-            $controllerClass = 'Controllers\AuthController';
+            $controllerClass = 'Cinebox\App\Controllers\AuthController';
             (new $controllerClass($database))->logout();
         }
         break;
 
     case 'filme':
-        $controllerClass = 'Controllers\FilmeController';
+        $controllerClass = 'Cinebox\App\Controllers\FilmeController';
         $controller = new $controllerClass($database);
         switch ($method) {
             case 'GET':
@@ -61,7 +61,7 @@ switch ($resource) {
         break;
 
     case 'avaliacao':
-        $controllerClass = 'Controllers\AvaliacaoController';
+        $controllerClass = 'Cinebox\App\Controllers\AvaliacaoController';
         $controller = new $controllerClass($database);
         switch ($method) {
             case 'POST':

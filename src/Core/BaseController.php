@@ -1,6 +1,6 @@
 <?php
 
-namespace Core;
+namespace Cinebox\App\Core;
 
 class BaseController
 {

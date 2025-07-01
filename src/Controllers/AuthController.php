@@ -1,11 +1,11 @@
 <?php
 
-namespace Controllers;
+namespace Cinebox\App\Controllers;
 
-use Core\BaseController;
-use Core\Database;
+use Cinebox\App\Core\BaseController;
+use Cinebox\App\Core\Database;
 
-use Services\AuthService;
+use Cinebox\App\Services\AuthService;
 
 class AuthController extends BaseController
 {

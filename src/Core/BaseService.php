@@ -1,6 +1,6 @@
 <?php
 
-namespace Core;
+namespace Cinebox\App\Core;
 
 Class BaseService {
     protected function safe(callable $callback, string $errorMessage): mixed

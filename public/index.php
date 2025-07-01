@@ -1,19 +1,9 @@
 <?php
 
-require_once __DIR__ . '/../src/Core/Helpers.php';
-require_once __DIR__ . '/../src/Core/Database.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
-spl_autoload_register(function ($class) {
-    $classPath = str_replace('\\', DIRECTORY_SEPARATOR, $class) . '.php';
-
-    $baseDir = __DIR__ . '/../src/';
-
-    $file = $baseDir . $classPath;
-
-    if (file_exists($file)) {
-        require_once $file;
-    }
-});
+require __DIR__ . '/../src/Core/Helpers.php';
+require __DIR__ . '/../src/Core/Database.php';
 
 session_start();
 

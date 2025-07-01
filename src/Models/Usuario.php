@@ -1,8 +1,8 @@
 <?php
 
-namespace Models;
+namespace Cinebox\App\Models;
 
-use Core\Database;
+use Cinebox\App\Core\Database;
 use PDOStatement;
 
 class Usuario
