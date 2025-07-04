@@ -7,8 +7,13 @@ use Firebase\JWT\Key;
 
 class JwtService
 {
-    private string $secretKey = '98SDFH9FPASP98HFV';
+    private string $secretKey;
     private string $algoritmo = 'HS256';
+
+    public function __construct() 
+    {
+        $this->secretKey = $_ENV['JWT_SECRET'];
+    }
 
     public function gerarToken(array $payload, int $expireInSeconds = 3600)
     {
