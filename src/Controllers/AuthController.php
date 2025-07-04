@@ -6,14 +6,17 @@ use Cinebox\App\Core\BaseController;
 use Cinebox\App\Core\Database;
 
 use Cinebox\App\Services\AuthService;
+use Cinebox\App\Services\JwtService;
 
 class AuthController extends BaseController
 {
     private AuthService $authService;
+    private JwtService $jwtService;
 
     public function __construct(Database $database)
     {
         $this->authService = new AuthService($database);
+        $this->jwtService = new JwtService;
     }
 
     public function store(): void
@@ -58,23 +61,27 @@ class AuthController extends BaseController
                 jsonResponse(['status' => false, 'message' => 'Email ou senha incorretos.'], 401);
             }
 
-            $_SESSION['auth'] = [
+            $payload = [
                 'id' => $usuario->id,
                 'nome' => $usuario->nome,
                 'email' => $usuario->email
             ];
 
+            $token = $this->jwtService->gerarToken($payload);
+
+            if (!$token) {
+                jsonResponse(['status' => false, 'message' => 'Email ou senha incorretos.'], 401);
+            }
+
             jsonResponse([
                 'status' => true,
                 'message' => 'Usuário autenticado com sucesso.',
-                'usuario' => $usuario
+                'usuario' => [
+                    'nome' => $usuario->nome,
+                    'email' => $usuario->email
+                ],
+                'token' => $token
             ]);
         });
-    }
-
-    public function logout(): void
-    {
-        unset($_SESSION['auth']);
-        jsonResponse(['status' => true, 'message' => 'Usuário desconectado com sucesso.']);
     }
 }

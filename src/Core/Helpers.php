@@ -1,5 +1,7 @@
 <?php
 
+use Cinebox\App\Services\JwtService;
+
 function dd($data): never
 {
     echo '<pre>';
@@ -28,17 +30,23 @@ function auth(): object|false
     return (object) $_SESSION['auth'];
 }
 
-function requireAuthenticatedUser(): object
+function requireAuthenticatedUser()
 {
-    $usuario = auth();
+    $headers = getallheaders();
 
-    if (!isset($usuario->id)) {
-        http_response_code(401);
-        echo json_encode(['error' => 'Usuário não autenticado.']);
-        exit;
+    if (!isset($headers['Authorization'])) {
+        jsonResponse(['status' => false, 'message' => 'Token não fornecido'], 401);
     }
 
-    return $usuario;
+    $token = str_replace('Bearer ', '', $headers['Authorization']);
+    $jwtService = new JwtService;
+    $decoded = $jwtService->validarToken($token);
+
+    if (!$decoded) {
+        jsonResponse(['status' => false, 'message' => 'Token inválido ou expirado'], 401);
+    }
+
+    return $decoded;
 }
 
 function getRequestData(): array
