@@ -2,16 +2,17 @@
 
 namespace Cinebox\App\Controllers;
 
-use Cinebox\App\Core\BaseController;
+use Cinebox\App\Core\AuthenticatedController;
 use Cinebox\App\Core\Database;
 use Cinebox\App\Services\AvaliacaoService;
 
-class AvaliacaoController extends BaseController
+class AvaliacaoController extends AuthenticatedController
 {
     private AvaliacaoService $avaliacaoService;
 
     public function __construct(Database $database)
     {
+        parent::__construct(); 
         $this->avaliacaoService = new AvaliacaoService($database);
     }
 
@@ -20,7 +21,7 @@ class AvaliacaoController extends BaseController
         $this->safe(function () use ($id): void {
             $dados = getRequestData();
 
-            $usuario = requireAuthenticatedUser();
+            $usuario = $this->usuario;
 
             $erros = $this->avaliacaoService->validarDados($dados);
             if (!empty($erros)) {
@@ -50,7 +51,7 @@ class AvaliacaoController extends BaseController
     public function destroy(int $id): void
     {
         $this->safe(function () use ($id): void {
-            $usuario = requireAuthenticatedUser();
+            $usuario = $this->usuario;
 
             $dados = [
                 'id' => $id,

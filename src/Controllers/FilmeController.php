@@ -4,18 +4,23 @@ namespace Cinebox\App\Controllers;
 
 use Cinebox\App\Core\BaseController;
 use Cinebox\App\Core\Database;
+
 use Cinebox\App\Services\FilmeService;
 use Cinebox\App\Services\AvaliacaoService;
+
+use Cinebox\App\Middlewares\AuthMiddleware;
 
 class FilmeController extends BaseController
 {
     private FilmeService $filmeService;
     private AvaliacaoService $avaliacaoService;
+    private AuthMiddleware $authMiddleware;
 
     public function __construct(Database $database)
     {
         $this->filmeService = new FilmeService($database);
         $this->avaliacaoService = new AvaliacaoService($database);
+        $this->authMiddleware = new AuthMiddleware($database);
     }
 
     public function index(): void
@@ -58,7 +63,7 @@ class FilmeController extends BaseController
     public function meusFilmes(): void
     {
         $this->safe(function (): void {
-            $usuario = requireAuthenticatedUser();
+            $usuario = $this->authMiddleware->handle();
 
             $filmes = $this->filmeService->buscarFilmesUsuario($usuario->id);
 
@@ -83,7 +88,7 @@ class FilmeController extends BaseController
         $this->safe(function (): void {
             $dados = getRequestData();
 
-            $usuario = requireAuthenticatedUser();
+            $usuario = $this->authMiddleware->handle();
 
             $erros = $this->filmeService->validarDados($dados);
 
@@ -104,7 +109,7 @@ class FilmeController extends BaseController
     public function favoritarFilme(int $id): void
     {
         $this->safe(function ()  use ($id): void {
-            $usuario = requireAuthenticatedUser();
+            $usuario = $this->authMiddleware->handle();
 
             $resultado = $this->filmeService->obterStatusFilmeParaUsuario($id, $usuario->id);
 
@@ -129,7 +134,7 @@ class FilmeController extends BaseController
     public function desfavoritarFilme(int $id): void
     {
         $this->safe(function ()  use ($id): void {
-            $usuario = requireAuthenticatedUser();
+            $usuario = $this->authMiddleware->handle();
 
             $resultado = $this->filmeService->obterStatusFilmeParaUsuario($id, $usuario->id);
 
