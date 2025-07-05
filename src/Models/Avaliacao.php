@@ -69,10 +69,11 @@ class Avaliacao
         );
     }
 
-    public static function buscarAvaliacao(Database $database, int $id): array|null
+    public static function buscarAvaliacao(Database $database, int $id): ?Avaliacao
     {
-        $avaliacao = $database->query(
-            "SELECT * FROM avaliacoes WHERE id = :id",
+         $avaliacao = self::queryFilmeAvaliacao(
+            $database,
+            where: 'a.id = :id',
             params: ['id' => $id]
         )->fetch();
 

@@ -4,9 +4,11 @@ namespace Cinebox\App\Services;
 
 use Cinebox\App\Core\BaseService;
 use Cinebox\App\Core\Database;
-use Cinebox\App\Utils\Validacao;
+
 use Cinebox\App\Models\Filme;
 use Cinebox\App\Models\Avaliacao;
+
+use Cinebox\App\Utils\Validacao;
 
 class AvaliacaoService extends BaseService
 {
@@ -17,14 +19,16 @@ class AvaliacaoService extends BaseService
         $this->database = $database;
     }
 
-    private function idInvalido(int $id): bool
+    private function ensureValidId(int $id): void
     {
-        return $id <= 0;
+        if ($id <= 0) {
+            throw new \InvalidArgumentException('ID inválido.');
+        }
     }
 
     public function verificarFilmeExiste(int $id): bool
     {
-        if ($this->idInvalido($id)) return false;
+        $this->ensureValidId($id);
 
         $resultado = $this->safe(
             fn() => Filme::buscarFilmePorId($this->database, $id),
@@ -34,7 +38,7 @@ class AvaliacaoService extends BaseService
         return $resultado !== null;
     }
 
-    public function validarDados(array $dados): array
+    public function validarCamposAvaliacao(array $dados): array
     {
         $regras = [
             'nota' => ['required', 'numeric', 'between:1-5', 'length:1'],
@@ -46,24 +50,30 @@ class AvaliacaoService extends BaseService
         return $validador->erros();
     }
 
-    public function criarAvaliacao(array $dados, int $id, int $usuario_id): bool|\PDOStatement
+    public function criarAvaliacao(array $dados, int $id, int $usuario_id): ?Avaliacao
     {
-        if ($this->idInvalido($id)) return false;
+        $this->ensureValidId($id);
 
         $dados += [
             'filme_id' => $id,
             'usuario_id' => $usuario_id
         ];
 
-        return $this->safe(
+        $stmt = $this->safe(
             fn() => Avaliacao::criarAvaliacao($this->database, $dados),
             'Erro ao incluir avaliação no banco de dados.'
         );
+
+        if ($stmt->rowCount() === 0) {
+            throw new \Exception('Não foi possível avaliar o filme.');
+        }
+
+        return Avaliacao::buscarAvaliacaoUsuarioFilme($this->database, $dados['filme_id'], $dados['usuario_id']);
     }
 
-    public function listarAvaliacoes(int $id): bool|array
+    public function listarAvaliacoes(int $id): array
     {
-        if ($this->idInvalido($id)) return false;
+        $this->ensureValidId($id);
 
         return $this->safe(
             fn() => Avaliacao::buscarAvaliacoesFilme($this->database, $id),
@@ -71,9 +81,9 @@ class AvaliacaoService extends BaseService
         );
     }
 
-    public function buscarAvaliacaoUsuarioFilme(int $id, int $usuario_id): bool|Avaliacao|null
+    public function buscarAvaliacaoUsuarioFilme(int $id, int $usuario_id): ?Avaliacao
     {
-        if ($this->idInvalido($id)) return false;
+        $this->ensureValidId($id);
 
         return $this->safe(
             fn() => Avaliacao::buscarAvaliacaoUsuarioFilme($this->database, $id, $usuario_id),
@@ -81,14 +91,16 @@ class AvaliacaoService extends BaseService
         );
     }
 
-    public function buscarAvaliacaoPorId(int $id): ?array
+    public function buscarAvaliacaoPorId(int $id): ?Avaliacao
     {
-        if ($this->idInvalido($id)) return null;
+        $this->ensureValidId($id);
 
-        return $this->safe(
+        $avaliacao = $this->safe(
             fn() => Avaliacao::buscarAvaliacao($this->database, $id),
-            'Erro ao consultar avaliacao no banco de dados.'
+            'Erro ao consultar avaliação no banco de dados.'
         );
+
+        return $avaliacao;
     }
 
     public function excluirAvaliacao(array $dados): bool

@@ -4,7 +4,11 @@ namespace Cinebox\App\Controllers;
 
 use Cinebox\App\Core\AuthenticatedController;
 use Cinebox\App\Core\Database;
+
 use Cinebox\App\Services\AvaliacaoService;
+
+use Cinebox\App\Helpers\Response;
+use Cinebox\App\Helpers\Request;
 
 class AvaliacaoController extends AuthenticatedController
 {
@@ -19,32 +23,32 @@ class AvaliacaoController extends AuthenticatedController
     public function store(int $id): void
     {
         $this->safe(function () use ($id): void {
-            $dados = getRequestData();
+            $dados = Request::getData();
 
             $usuario = $this->usuario;
 
-            $erros = $this->avaliacaoService->validarDados($dados);
+            $erros = $this->avaliacaoService->validarCamposAvaliacao($dados);
             if (!empty($erros)) {
-                jsonResponse(['success' => false, "message" => "Dados inválidos!", "errors" => $erros], 400);
+                Response::error('Dados inválidos!', $erros, 400);
             }
 
-            $filme = $this->avaliacaoService->verificarFilmeExiste($id);
-
-            if ($filme === false) {
-                jsonResponse(['success' => false, "message" => "Filme não encontrado!"], 400);
+            $filmeExiste = $this->avaliacaoService->verificarFilmeExiste($id);
+            if (!$filmeExiste) {
+                Response::error('Filme não encontrado!', [], 404);
             }
 
             $avaliado = ($this->avaliacaoService->buscarAvaliacaoUsuarioFilme($id, $usuario->id));
-            if (!empty($avaliado)) {
-                jsonResponse(['success' => false, "message" => "Filme já avaliado!"], 400);
+            if ($avaliado) {
+                Response::error('Filme já avaliado!', [], 409);
             }
 
             $avaliacao = $this->avaliacaoService->criarAvaliacao($dados, $id, $usuario->id);
-            if (!$avaliacao) {
-                jsonResponse(['success' => false, "message" => "Erro ao salvar avaliação!"], 400);
-            }
 
-            jsonResponse(['success' => true, "message" => "Filme avaliado com sucesso!"]);
+            Response::success('Filme avaliado com sucesso!', [
+                'avaliacao' => ['id' => $avaliacao->id],
+                'usuario' => ['id' => $avaliacao->usuario_id],
+                'filme' => ['id' => $avaliacao->filme_id],
+            ]);
         });
     }
 
@@ -61,18 +65,20 @@ class AvaliacaoController extends AuthenticatedController
             $avaliacao = $this->avaliacaoService->buscarAvaliacaoPorId($id);
 
             if (!$avaliacao) {
-                jsonResponse(['success' => false, 'message' => 'Avaliação não encontrada.'], 400);
+                Response::error('Avaliação não encontrada.', [], 404);
             }
 
-            if ($avaliacao['usuario_id'] !== $usuario->id) {
-                jsonResponse(['success' => false, 'message' => 'Você não tem permissão para excluir esta avaliação.'], 403);
+            if ($avaliacao->usuario_id !== $usuario->id) {
+                Response::error('Você não tem permissão para excluir esta avaliação.', [], 403);
             }
 
-            if (!$this->avaliacaoService->excluirAvaliacao($dados)) {
-                jsonResponse(['success' => false, "message" => "Erro ao excluir avaliação!"], 400);
-            }
+            $this->avaliacaoService->excluirAvaliacao($dados);
 
-            jsonResponse(['success' => true, "message" => "Avaliação removida com sucesso!"]);
+            Response::success('Avaliação removida com sucesso!', [
+                'avaliacao' => ['id' => $avaliacao->id],
+                'usuario' => ['id' => $avaliacao->usuario_id],
+                'filme' => ['id' => $avaliacao->filme_id]
+            ]);
         });
     }
 }
