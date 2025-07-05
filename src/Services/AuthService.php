@@ -4,8 +4,10 @@ namespace Cinebox\App\Services;
 
 use Cinebox\App\Core\BaseService;
 use Cinebox\App\Core\Database;
-use Cinebox\App\Utils\Validacao;
+
 use Cinebox\App\Models\Usuario;
+
+use Cinebox\App\Utils\Validacao;
 
 class AuthService extends BaseService
 {
@@ -50,13 +52,13 @@ class AuthService extends BaseService
     public function autenticar(string $email, string $senha): ?Usuario
     {
         $usuario = $this->safe(
-            fn() => Usuario::buscarUsuarioCredenciais($this->database, $email),
+            fn() => Usuario::buscarUsuarioPorEmail($this->database, $email),
             'Erro ao consultar banco de dados.'
         );
         return $usuario && $usuario->verificarSenha($senha) ? $usuario : null;
     }
 
-    public function registrar(array $dados): bool
+    public function registrar(array $dados): Usuario
     {
         $dadosFiltrados = [
             'nome' => $dados['nome'] ?? '',
@@ -69,6 +71,10 @@ class AuthService extends BaseService
             'Erro ao inserir usuario no banco de dados.'
         );
 
-        return $stmt->rowCount() > 0;
+        if ($stmt->rowCount() === 0) {
+            throw new \Exception('Não foi possível registrar o usuário.');
+        }
+        
+        return Usuario::buscarUsuarioPorEmail($this->database, $dadosFiltrados['email']);
     }
 }

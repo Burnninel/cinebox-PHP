@@ -12,7 +12,7 @@ class Usuario
     public string $email;
     public string $senha;
 
-    public static function buscarUsuarioCredenciais(Database $database, string $email): ?self
+    public static function buscarUsuarioPorEmail(Database $database, string $email): ?self
     {
         $usuario = $database->query(
             query: "SELECT * FROM usuarios WHERE email = :email",
