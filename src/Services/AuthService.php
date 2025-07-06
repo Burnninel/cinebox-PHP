@@ -9,6 +9,8 @@ use Cinebox\App\Models\Usuario;
 
 use Cinebox\App\Utils\Validacao;
 
+use Cinebox\App\Helpers\Insert;
+
 class AuthService extends BaseService
 {
     protected Database $database;
@@ -66,15 +68,12 @@ class AuthService extends BaseService
             'senha' => Usuario::hashSenha($dados['senha'] ?? '')
         ];
 
-        $stmt = $this->safe(
-            fn() => Usuario::cadastrarUsuario($this->database, $dadosFiltrados),
+        return $this->safe(
+            fn() => Insert::execute(
+                fn() => Usuario::cadastrarUsuario($this->database, $dadosFiltrados),
+                fn() => Usuario::buscarUsuarioPorEmail($this->database, $dadosFiltrados['email']),
+            ),
             'Erro ao inserir usuario no banco de dados.'
         );
-
-        if ($stmt->rowCount() === 0) {
-            throw new \Exception('Não foi possível registrar o usuário.');
-        }
-        
-        return Usuario::buscarUsuarioPorEmail($this->database, $dadosFiltrados['email']);
     }
 }

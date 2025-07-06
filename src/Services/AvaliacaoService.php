@@ -7,8 +7,10 @@ use Cinebox\App\Core\Database;
 
 use Cinebox\App\Models\Filme;
 use Cinebox\App\Models\Avaliacao;
-
+use Cinebox\App\Models\Usuario;
 use Cinebox\App\Utils\Validacao;
+
+use Cinebox\App\Helpers\Insert;
 
 class AvaliacaoService extends BaseService
 {
@@ -59,16 +61,13 @@ class AvaliacaoService extends BaseService
             'usuario_id' => $usuario_id
         ];
 
-        $stmt = $this->safe(
-            fn() => Avaliacao::criarAvaliacao($this->database, $dados),
+        return $this->safe(
+            fn() => Insert::execute(
+                fn() => Avaliacao::criarAvaliacao($this->database, $dados),
+                fn() => Avaliacao::buscarAvaliacaoUsuarioFilme($this->database, $dados['filme_id'], $dados['usuario_id'])
+            ),
             'Erro ao incluir avaliação no banco de dados.'
         );
-
-        if ($stmt->rowCount() === 0) {
-            throw new \Exception('Não foi possível avaliar o filme.');
-        }
-
-        return Avaliacao::buscarAvaliacaoUsuarioFilme($this->database, $dados['filme_id'], $dados['usuario_id']);
     }
 
     public function listarAvaliacoes(int $id): array
