@@ -4,8 +4,12 @@ namespace Cinebox\App\Services;
 
 use Cinebox\App\Core\BaseService;
 use Cinebox\App\Core\Database;
-use Cinebox\App\Utils\Validacao;
+
 use Cinebox\App\Models\Filme;
+
+use Cinebox\App\Helpers\Insert;
+
+use Cinebox\App\Utils\Validacao;
 
 class FilmeService extends BaseService
 {
@@ -16,7 +20,17 @@ class FilmeService extends BaseService
         $this->database = $database;
     }
 
-    public function buscarFilmes(string $pesquisar): array|false
+    private function validarDadosDeFavorito(array $dados): void
+    {
+        if (
+            !isset($dados['filme_id'], $dados['usuario_id']) ||
+            !is_numeric($dados['filme_id']) || !is_numeric($dados['usuario_id'])
+        ) {
+            throw new \InvalidArgumentException('Dados inválidos para favoritar/desfavoritar filme.');
+        }
+    }
+
+    public function buscarFilmes(string $pesquisar): array
     {
         return $this->safe(
             fn() => Filme::buscarFilmes($this->database, $pesquisar),
@@ -24,22 +38,24 @@ class FilmeService extends BaseService
         );
     }
 
-    public function buscarFilmePorId(int $id):  ?filme
+    public function buscarFilmePorId(int $id): ?Filme
     {
         $filme = $this->safe(
             fn() => Filme::buscarFilmePorId($this->database, $id),
             'Erro ao buscar filme no banco de dados.'
         );
 
-        return $filme ?: null;
+        return $filme;
     }
 
-    public function buscarFilmesUsuario(int $usuario_id): array|false
+    public function buscarFilmesUsuario(int $usuario_id): array
     {
-        return $this->safe(
+        $resultado = $this->safe(
             fn() => Filme::buscarFilmesPorUsuario($this->database, $usuario_id),
             'Erro ao buscar filmes do usuario no banco de dados.'
         );
+
+        return is_array($resultado) ? $resultado : [];
     }
 
     public function validarDados(array $dados): array
@@ -50,7 +66,12 @@ class FilmeService extends BaseService
             'categoria' => ['required', 'string'],
             'sinopse' => ['required', 'string'],
             'ano_de_lancamento' => [
-                'required', 'numeric', 'max:4', 'min:4', 'between:1900-2025', 'length:4'
+                'required',
+                'numeric',
+                'max:4',
+                'min:4',
+                'between:1900-2025',
+                'length:4'
             ]
         ];
 
@@ -59,28 +80,28 @@ class FilmeService extends BaseService
         return $validador->erros();
     }
 
-    public function criarFilme(array $dados, int $usuario_id): bool
+    public function criarFilme(array $dados, int $usuario_id): Filme
     {
-        $filmeId = $this->safe(
-            fn() => Filme::criarFilme($this->database, $dados, $usuario_id),
+
+        return $this->safe(
+            fn() => Insert::execute(
+                fn() => Filme::criarFilme($this->database, $dados, $usuario_id),
+                fn($id) => Filme::buscarFilmePorId($this->database, $id)
+            ),
             'Erro ao incluir filme no banco de dados.'
         );
-
-        return !empty($filmeId);
     }
 
     public function favoritarFilme(array $dados): bool
     {
-        if (!isset($dados['filme_id'], $dados['usuario_id']) || !is_numeric($dados['filme_id'])) {
-            return false;
-        }
+        $this->validarDadosDeFavorito($dados);
 
         $stmt = $this->safe(
             fn() => Filme::favoritarFilme($this->database, $dados),
             'Erro ao registrar filme favorito no banco de dados.'
         );
 
-        return $stmt !== false;
+        return $stmt !== false && $stmt->rowCount() > 0;
     }
 
     public function obterStatusFilmeParaUsuario(int $filme_id, int $usuario_id): array
@@ -117,15 +138,13 @@ class FilmeService extends BaseService
 
     public function desfavoritarFilme(array $dados): bool
     {
-        if (!isset($dados['filme_id'], $dados['usuario_id']) || !is_numeric($dados['filme_id'])) {
-            return false;
-        }
+        $this->validarDadosDeFavorito($dados);
 
         $stmt = $this->safe(
             fn() => Filme::desfavoritarFilme($this->database, $dados),
             'Erro ao remover filme dos favoritos no banco de dados.'
         );
 
-        return $stmt !== false;
+        return $stmt !== false && $stmt->rowCount() > 0;
     }
 }

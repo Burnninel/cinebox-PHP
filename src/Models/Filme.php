@@ -118,13 +118,11 @@ class Filme
         );
     }
 
-    public static function desfavoritarFilme(Database $database, array $dados): bool
+    public static function desfavoritarFilme(Database $database, array $dados): PDOStatement
     {
-        $stmt = $database->query(
+        return $database->query(
             "DELETE FROM usuarios_filmes WHERE usuario_id = :usuario_id AND filme_id = :filme_id",
             params: $dados
         );
-
-        return $stmt->rowCount() > 0;
     }
 }
