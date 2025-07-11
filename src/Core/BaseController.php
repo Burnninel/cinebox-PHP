@@ -27,6 +27,7 @@ class BaseController
                 'ip'        => $_SERVER['REMOTE_ADDR'] ?? null,
                 'method'    => $_SERVER['REQUEST_METHOD'] ?? null,
             ]);
+
             jsonResponse([
                 'success' => false,
                 'message' => 'Erro interno do servidor.',

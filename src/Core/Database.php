@@ -34,7 +34,7 @@ class Database
     {
         $prepare = $this->db->prepare("$query");
 
-         if($class) {
+        if ($class) {
             $prepare->setFetchMode(PDO::FETCH_CLASS, $class);
         }
 

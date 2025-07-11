@@ -14,7 +14,7 @@ $action = $segments[2] ?? null;
 switch ($resource) {
     case 'login':
         $controllerClass = 'Cinebox\App\Controllers\AuthController';
-        $controller = new $controllerClass($database);
+
         if ($method === 'POST') {
             (new $controllerClass($database))->login();
         }
@@ -37,6 +37,7 @@ switch ($resource) {
     case 'filme':
         $controllerClass = 'Cinebox\App\Controllers\FilmeController';
         $controller = new $controllerClass($database);
+
         switch ($method) {
             case 'GET':
                 if (!$param) {
@@ -45,7 +46,7 @@ switch ($resource) {
                     $controller->meusFilmes();
                 } else {
                     $controller->show(ensureValidId($param));
-                } 
+                }
                 break;
 
             case 'POST':
@@ -63,6 +64,7 @@ switch ($resource) {
     case 'avaliacao':
         $controllerClass = 'Cinebox\App\Controllers\AvaliacaoController';
         $controller = new $controllerClass($database);
+
         switch ($method) {
             case 'POST':
                 $controller->store(ensureValidId($param));
