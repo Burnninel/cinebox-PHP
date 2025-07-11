@@ -8,6 +8,7 @@ use Cinebox\App\Core\Database;
 use Cinebox\App\Models\Filme;
 
 use Cinebox\App\Helpers\Insert;
+use Cinebox\App\Helpers\Log;
 
 use Cinebox\App\Utils\Validacao;
 
@@ -82,14 +83,21 @@ class FilmeService extends BaseService
 
     public function criarFilme(array $dados, int $usuario_id): Filme
     {
-
-        return $this->safe(
+        $filme = $this->safe(
             fn() => Insert::execute(
                 fn() => Filme::criarFilme($this->database, $dados, $usuario_id),
                 fn($id) => Filme::buscarFilmePorId($this->database, $id)
             ),
             'Erro ao incluir filme no banco de dados.'
         );
+
+        Log::info('Filme criado.', [
+            'id' => $filme->id,
+            'usuario_id' => $usuario_id,
+            'titulo' => $filme->titulo
+        ]);
+
+        return $filme;
     }
 
     public function favoritarFilme(array $dados): bool
@@ -101,7 +109,19 @@ class FilmeService extends BaseService
             'Erro ao registrar filme favorito no banco de dados.'
         );
 
-        return $stmt !== false && $stmt->rowCount() > 0;
+        if ($stmt !== false && $stmt->rowCount() > 0) {
+            Log::info('Filme favoritado com sucesso.', [
+                'filme_id' => $dados['filme_id'],
+                'usuario_id' => $dados['usuario_id']
+            ]);
+            return true;
+        } else {
+            Log::warning('Tentativa de favoritar filme não resultou em alteração.', [
+                'filme_id' => $dados['filme_id'],
+                'usuario_id' => $dados['usuario_id']
+            ]);
+            return false;
+        }
     }
 
     public function obterStatusFilmeParaUsuario(int $filme_id, int $usuario_id): array
@@ -145,6 +165,18 @@ class FilmeService extends BaseService
             'Erro ao remover filme dos favoritos no banco de dados.'
         );
 
-        return $stmt !== false && $stmt->rowCount() > 0;
+        if ($stmt !== false && $stmt->rowCount() > 0) {
+            Log::info('Filme removido dos favoritos com sucesso.', [
+                'filme_id' => $dados['filme_id'],
+                'usuario_id' => $dados['usuario_id']
+            ]);
+            return true;
+        } else {
+            Log::warning('Tentativa de desfavoritar filme não resultou em alteração.', [
+                'filme_id' => $dados['filme_id'],
+                'usuario_id' => $dados['usuario_id']
+            ]);
+            return false;
+        }
     }
 }
