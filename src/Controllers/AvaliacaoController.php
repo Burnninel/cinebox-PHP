@@ -4,9 +4,7 @@ namespace Cinebox\App\Controllers;
 
 use Cinebox\App\Core\AuthenticatedController;
 use Cinebox\App\Core\Database;
-
 use Cinebox\App\Services\AvaliacaoService;
-
 use Cinebox\App\Helpers\Response;
 use Cinebox\App\Helpers\Request;
 
@@ -16,7 +14,7 @@ class AvaliacaoController extends AuthenticatedController
 
     public function __construct(Database $database)
     {
-        parent::__construct(); 
+        parent::__construct();
         $this->avaliacaoService = new AvaliacaoService($database);
     }
 

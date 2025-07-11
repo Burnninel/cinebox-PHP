@@ -4,12 +4,9 @@ namespace Cinebox\App\Controllers;
 
 use Cinebox\App\Core\BaseController;
 use Cinebox\App\Core\Database;
-
 use Cinebox\App\Services\FilmeService;
 use Cinebox\App\Services\AvaliacaoService;
-
 use Cinebox\App\Middlewares\AuthMiddleware;
-
 use Cinebox\App\Helpers\Response;
 use Cinebox\App\Helpers\Request;
 
@@ -85,7 +82,6 @@ class FilmeController extends BaseController
             $usuario = $this->authMiddleware->handle();
 
             $erros = $this->filmeService->validarDados($dados);
-
             if (!empty($erros)) {
                 Response::error('Dados inválidos!', $erros, 400);
             }
@@ -119,7 +115,6 @@ class FilmeController extends BaseController
             }
 
             $favoritar = $this->filmeService->favoritarFilme($resultado['dados']);
-
             if (!$favoritar) {
                 Response::error('Erro ao favoritar filme! Tente novamente.', [], 500);
             }
@@ -149,7 +144,6 @@ class FilmeController extends BaseController
             }
 
             $desfavoritar = $this->filmeService->desfavoritarFilme($resultado['dados']);
-
             if (!$desfavoritar) {
                 Response::error('Erro ao desfavoritar filme! Tente novamente.', [], 500);
             }

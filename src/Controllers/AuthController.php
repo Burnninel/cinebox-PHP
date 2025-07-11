@@ -4,10 +4,8 @@ namespace Cinebox\App\Controllers;
 
 use Cinebox\App\Core\BaseController;
 use Cinebox\App\Core\Database;
-
 use Cinebox\App\Services\AuthService;
 use Cinebox\App\Services\JwtService;
-
 use Cinebox\App\Helpers\Response;
 use Cinebox\App\Helpers\Request;
 
@@ -28,7 +26,6 @@ class AuthController extends BaseController
             $dados = Request::getData();
 
             $erros = $this->authService->validarRegistro($dados);
-
             if (!empty($erros)) {
                 Response::error('Dados inválidos.', $erros, 400);
             }
@@ -48,7 +45,6 @@ class AuthController extends BaseController
             $dados = Request::getData();
 
             $erros = $this->authService->validarLogin($dados);
-
             if (!empty($erros)) {
                 Response::error('Erro ao realizar login.', $erros, 400);
             }
