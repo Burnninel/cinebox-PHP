@@ -7,10 +7,11 @@ use Cinebox\App\Core\Database;
 
 use Cinebox\App\Models\Filme;
 use Cinebox\App\Models\Avaliacao;
-use Cinebox\App\Models\Usuario;
+
 use Cinebox\App\Utils\Validacao;
 
 use Cinebox\App\Helpers\Insert;
+use Cinebox\App\Helpers\Log;
 
 class AvaliacaoService extends BaseService
 {
@@ -61,13 +62,21 @@ class AvaliacaoService extends BaseService
             'usuario_id' => $usuario_id
         ];
 
-        return $this->safe(
+        $avaliacao = $this->safe(
             fn() => Insert::execute(
                 fn() => Avaliacao::criarAvaliacao($this->database, $dados),
                 fn() => Avaliacao::buscarAvaliacaoUsuarioFilme($this->database, $dados['filme_id'], $dados['usuario_id'])
             ),
             'Erro ao incluir avaliação no banco de dados.'
         );
+
+        Log::info('Avaliação registrada.', [
+            'id' => $avaliacao->id,
+            'usuario_id' => $avaliacao->usuario_id,
+            'filme_id' => $avaliacao->filme_id
+        ]);
+
+        return $avaliacao;
     }
 
     public function listarAvaliacoes(int $id): array
@@ -98,15 +107,21 @@ class AvaliacaoService extends BaseService
             fn() => Avaliacao::buscarAvaliacao($this->database, $id),
             'Erro ao consultar avaliação no banco de dados.'
         );
-
         return $avaliacao;
     }
 
     public function excluirAvaliacao(array $dados): bool
     {
-        return $this->safe(
+        $avaliacao = $this->safe(
             fn() => Avaliacao::removerAvaliacao($this->database, $dados),
             'Erro ao consultar avaliacao no banco de dados.'
         );
+
+        Log::info('Avaliação removida.', [
+            'id' => $dados['id'],
+            'usuario_id' => $dados['usuario_id']
+        ]);
+
+        return $avaliacao;
     }
 }
