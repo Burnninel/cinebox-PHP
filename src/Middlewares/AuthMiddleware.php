@@ -4,6 +4,8 @@ namespace Cinebox\App\Middlewares;
 
 use Cinebox\App\Services\JwtService;
 
+use Cinebox\App\Helpers\Log;
+
 class AuthMiddleware
 {
     function handle()
@@ -19,6 +21,11 @@ class AuthMiddleware
         $payload = $jwtService->validarToken($token);
 
         if (!$payload) {
+            $dadosLog = $jwtService->extrairPayloadParaLog($token);
+            Log::warning('Token inválido ou expirado', [
+                'id' => $dadosLog['id'],
+                'email' => $dadosLog['email'], 
+            ]);
             jsonResponse(['status' => false, 'message' => 'Token inválido ou expirado'], 401);
         }
 
