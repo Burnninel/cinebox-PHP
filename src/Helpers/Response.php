@@ -4,7 +4,7 @@ namespace Cinebox\App\Helpers;
 
 class Response
 {
-     public static function json(array $dados, int $status = 200): never
+    public static function json(array $dados, int $status = 200): never
     {
         http_response_code($status);
         echo json_encode($dados);

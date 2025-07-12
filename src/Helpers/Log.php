@@ -19,14 +19,14 @@ class Log
     {
         if (!isset(self::$loggers[$type])) {
             $logger = new Logger('cinebox');
-            
+
             $logDir = __DIR__ . '/../../logs';
             if (!is_dir($logDir)) {
                 mkdir($logDir, 0777, true);
             }
 
             $typeDir = $logDir . "/$type";
-             if (!is_dir($typeDir)) {
+            if (!is_dir($typeDir)) {
                 mkdir($typeDir, 0777, true);
             }
 
@@ -34,7 +34,7 @@ class Log
 
             $formatter = new JsonFormatter();
 
-            $streamHandler = match($type) {
+            $streamHandler = match ($type) {
                 'info' => new StreamHandler($typeDir . "/$fileName.log", Level::Info),
                 'warning' => new StreamHandler($typeDir . "/$fileName.log", Level::Warning),
                 'error' => new StreamHandler($typeDir . "/$fileName.log", Level::Error)
@@ -42,7 +42,7 @@ class Log
 
             $streamHandler->setFormatter($formatter);
 
-            $filterHandler = match($type) {
+            $filterHandler = match ($type) {
                 'info' => new FilterHandler($streamHandler, Level::Info, Level::Info),
                 'warning' => new FilterHandler($streamHandler, Level::Warning, Level::Warning),
                 'error' => new FilterHandler($streamHandler, Level::Error, Level::Emergency)
