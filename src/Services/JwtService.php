@@ -10,7 +10,7 @@ class JwtService
     private string $secretKey;
     private string $algoritmo = 'HS256';
 
-    public function __construct() 
+    public function __construct()
     {
         $this->secretKey = $_ENV['JWT_SECRET'];
     }
@@ -45,10 +45,10 @@ class JwtService
         }
 
         // Pega apenas o payload
-        $payloadCodificado = $partes[1]; 
-        
+        $payloadCodificado = $partes[1];
+
         // str_repeat - quantos "=" vai por no fim do payload;
-            //  padding -> = 
+        //  padding -> = 
         // '4 -' -> garante que o total de caracteres seja múltiplo de 4, necessário para o base64;
         // strlen = retorna o tamanho da string (ex: 110);
         // '% 4' calcula o resto da divisão por 4 (27x4 = 108 -> 110-108 = 2) -> Resto 2

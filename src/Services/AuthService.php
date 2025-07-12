@@ -4,11 +4,8 @@ namespace Cinebox\App\Services;
 
 use Cinebox\App\Core\BaseService;
 use Cinebox\App\Core\Database;
-
 use Cinebox\App\Models\Usuario;
-
 use Cinebox\App\Utils\Validacao;
-
 use Cinebox\App\Helpers\Insert;
 use Cinebox\App\Helpers\Log;
 

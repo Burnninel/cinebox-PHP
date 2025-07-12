@@ -4,12 +4,9 @@ namespace Cinebox\App\Services;
 
 use Cinebox\App\Core\BaseService;
 use Cinebox\App\Core\Database;
-
 use Cinebox\App\Models\Filme;
-
 use Cinebox\App\Helpers\Insert;
 use Cinebox\App\Helpers\Log;
-
 use Cinebox\App\Utils\Validacao;
 
 class FilmeService extends BaseService
@@ -41,12 +38,10 @@ class FilmeService extends BaseService
 
     public function buscarFilmePorId(int $id): ?Filme
     {
-        $filme = $this->safe(
+        return $this->safe(
             fn() => Filme::buscarFilmePorId($this->database, $id),
             'Erro ao buscar filme no banco de dados.'
         );
-
-        return $filme;
     }
 
     public function buscarFilmesUsuario(int $usuario_id): array
@@ -114,12 +109,14 @@ class FilmeService extends BaseService
                 'filme_id' => $dados['filme_id'],
                 'usuario_id' => $dados['usuario_id']
             ]);
+
             return true;
         } else {
             Log::warning('Tentativa de favoritar filme não resultou em alteração.', [
                 'filme_id' => $dados['filme_id'],
                 'usuario_id' => $dados['usuario_id']
             ]);
+
             return false;
         }
     }
@@ -170,12 +167,14 @@ class FilmeService extends BaseService
                 'filme_id' => $dados['filme_id'],
                 'usuario_id' => $dados['usuario_id']
             ]);
+
             return true;
         } else {
             Log::warning('Tentativa de desfavoritar filme não resultou em alteração.', [
                 'filme_id' => $dados['filme_id'],
                 'usuario_id' => $dados['usuario_id']
             ]);
+
             return false;
         }
     }

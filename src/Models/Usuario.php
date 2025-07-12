@@ -31,7 +31,7 @@ class Usuario
     public static function cadastrarUsuario(Database $database, array $dados): PDOStatement
     {
         return $database->query(
-            "INSERT INTO usuarios (nome, email, senha) VALUES (:nome, :email, :senha)",
+            query: "INSERT INTO usuarios (nome, email, senha) VALUES (:nome, :email, :senha)",
             params: $dados
         );
     }

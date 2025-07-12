@@ -42,7 +42,7 @@ class Filme
         );
     }
 
-    public static function buscarFilmePorId(Database $database, int $id):  ?self
+    public static function buscarFilmePorId(Database $database, int $id): ?self
     {
         return (new self)->queryFilmes(
             $database,
@@ -82,15 +82,15 @@ class Filme
     public static function criarFilme(Database $database, array $dados, int $usuario_id): string
     {
         $database->query(
-            "INSERT INTO filmes (titulo, diretor, ano_de_lancamento, sinopse, categoria)
-             VALUES (:titulo, :diretor, :ano_de_lancamento, :sinopse, :categoria)",
+            query: "INSERT INTO filmes (titulo, diretor, ano_de_lancamento, sinopse, categoria)
+                VALUES (:titulo, :diretor, :ano_de_lancamento, :sinopse, :categoria)",
             params: $dados
         );
 
         $filme_id = $database->lastInsertId();
 
         $database->query(
-            "INSERT INTO usuarios_filmes (usuario_id, filme_id) VALUES (:usuario_id, :filme_id)",
+            query: "INSERT INTO usuarios_filmes (usuario_id, filme_id) VALUES (:usuario_id, :filme_id)",
             params: [
                 'usuario_id' => $usuario_id,
                 'filme_id' => $filme_id
@@ -103,7 +103,7 @@ class Filme
     public static function verificarFilmeFavoritado(Database $database, array $dados): bool
     {
         $resultado = $database->query(
-            "SELECT * FROM usuarios_filmes WHERE usuario_id = :usuario_id AND filme_id = :filme_id",
+            query: "SELECT * FROM usuarios_filmes WHERE usuario_id = :usuario_id AND filme_id = :filme_id",
             params: $dados
         )->fetch();
 
@@ -113,7 +113,7 @@ class Filme
     public static function favoritarFilme(Database $database, array $dados): PDOStatement
     {
         return $database->query(
-            "INSERT INTO usuarios_filmes (usuario_id, filme_id) VALUES (:usuario_id, :filme_id)",
+            query: "INSERT INTO usuarios_filmes (usuario_id, filme_id) VALUES (:usuario_id, :filme_id)",
             params: $dados
         );
     }
@@ -121,7 +121,7 @@ class Filme
     public static function desfavoritarFilme(Database $database, array $dados): PDOStatement
     {
         return $database->query(
-            "DELETE FROM usuarios_filmes WHERE usuario_id = :usuario_id AND filme_id = :filme_id",
+            query: "DELETE FROM usuarios_filmes WHERE usuario_id = :usuario_id AND filme_id = :filme_id",
             params: $dados
         );
     }

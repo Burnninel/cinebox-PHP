@@ -42,7 +42,7 @@ class Avaliacao
 
     public static function buscarAvaliacoesFilme(Database $database, int $filme_id): array
     {
-         return self::queryFilmeAvaliacao(
+        return self::queryFilmeAvaliacao(
             $database,
             where: 'f.id = :filme_id',
             params: ['filme_id' => $filme_id]
@@ -63,15 +63,15 @@ class Avaliacao
     public static function criarAvaliacao(Database $database, array $dados): PDOStatement
     {
         return $database->query(
-            "INSERT INTO avaliacoes (usuario_id, filme_id, nota, comentario)
-             VALUES (:usuario_id, :filme_id, :nota, :comentario)",
+            query: "INSERT INTO avaliacoes (usuario_id, filme_id, nota, comentario)
+                VALUES (:usuario_id, :filme_id, :nota, :comentario)",
             params: $dados
         );
     }
 
     public static function buscarAvaliacao(Database $database, int $id): ?Avaliacao
     {
-         $avaliacao = self::queryFilmeAvaliacao(
+        $avaliacao = self::queryFilmeAvaliacao(
             $database,
             where: 'a.id = :id',
             params: ['id' => $id]
@@ -83,7 +83,7 @@ class Avaliacao
     public static function removerAvaliacao(Database $database, array $dados): bool
     {
         $stmt = $database->query(
-            "DELETE FROM avaliacoes WHERE id = :id AND usuario_id = :usuario_id;",
+            query: "DELETE FROM avaliacoes WHERE id = :id AND usuario_id = :usuario_id;",
             params: $dados
         );
 

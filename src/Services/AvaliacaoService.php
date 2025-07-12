@@ -4,12 +4,9 @@ namespace Cinebox\App\Services;
 
 use Cinebox\App\Core\BaseService;
 use Cinebox\App\Core\Database;
-
 use Cinebox\App\Models\Filme;
 use Cinebox\App\Models\Avaliacao;
-
 use Cinebox\App\Utils\Validacao;
-
 use Cinebox\App\Helpers\Insert;
 use Cinebox\App\Helpers\Log;
 
@@ -103,11 +100,10 @@ class AvaliacaoService extends BaseService
     {
         $this->ensureValidId($id);
 
-        $avaliacao = $this->safe(
+        return $this->safe(
             fn() => Avaliacao::buscarAvaliacao($this->database, $id),
             'Erro ao consultar avaliação no banco de dados.'
         );
-        return $avaliacao;
     }
 
     public function excluirAvaliacao(array $dados): bool
