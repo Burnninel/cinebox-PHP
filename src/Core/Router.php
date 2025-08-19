@@ -1,6 +1,8 @@
 <?php
 
 header('Content-Type: application/json');
+header("Access-Control-Allow-Origin: http://localhost:5173");
+header("Access-Control-Allow-Headers: Content-Type, Authorization");
 
 $uri = trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
 $method = $_SERVER['REQUEST_METHOD'];
@@ -20,10 +22,17 @@ switch ($resource) {
         }
         break;
 
-    case 'registrar':
+    case 'signup':
         if ($method === 'POST') {
             $controllerClass = 'Cinebox\App\Controllers\AuthController';
             (new $controllerClass($database))->store();
+        }
+        break;
+    
+    case 'usuario':
+        if ($method === 'POST') {
+            $controllerClass = 'Cinebox\App\Controllers\AuthController';
+            (new $controllerClass($database))->validate();
         }
         break;
 

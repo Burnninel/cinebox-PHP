@@ -74,4 +74,31 @@ class AuthController extends BaseController
             ]);
         });
     }
+
+    public function validate(): void
+    {
+        $this->safe(function (): void {
+        $headers = apache_request_headers();
+        $authHeader = $headers['Authorization'] ?? null;
+
+        if (!$authHeader || !preg_match('/Bearer\s(\S+)/', $authHeader, $matches)) {
+            Response::error('Token não fornecido.', [], 401);
+        }
+
+        $token = $matches[1];
+        $validate = $this->jwtService->validarToken($token);
+
+        if (!$validate) {
+            Response::error('Token inválido ou expirado.', [], 401);
+        }
+
+        Response::success('Token válido.', [
+            'usuario' => [
+                'id' => $validate->id,
+                'nome' => $validate->nome,
+                'email' => $validate->email
+            ]
+        ]);
+    });
+    }
 }
