@@ -76,12 +76,12 @@ class AvaliacaoService extends BaseService
         return $avaliacao;
     }
 
-    public function listarAvaliacoes(int $id): array
+    public function listarAvaliacoes(int $id, ?int $usuario_id = null): array
     {
         $this->ensureValidId($id);
 
         return $this->safe(
-            fn() => Avaliacao::buscarAvaliacoesFilme($this->database, $id),
+            fn() => Avaliacao::buscarAvaliacoesFilme($this->database, $id, $usuario_id),
             'Erro ao consultar avaliações do filme no banco de dados.'
         );
     }

@@ -14,7 +14,7 @@ class Avaliacao
     public string $comentario;
     public int $nota;
 
-    public static function queryFilmeAvaliacao(Database $database, string $where, array $params = []): PDOStatement
+    public static function queryFilmeAvaliacao(Database $database, string $where, array $params = [], ?int $usuario_id = null): PDOStatement
     {
         $sql = "
             SELECT 
@@ -33,6 +33,13 @@ class Avaliacao
             $sql .= " WHERE $where";
         }
 
+        if ($usuario_id) {
+            $sql .= " ORDER BY (u.id = :usuario_id) DESC, a.id DESC";
+            $params['usuario_id'] = $usuario_id;
+        } else {
+            $sql .= " ORDER BY a.id DESC";
+        }
+
         return $database->query(
             query: $sql,
             class: self::class,
@@ -40,12 +47,13 @@ class Avaliacao
         );
     }
 
-    public static function buscarAvaliacoesFilme(Database $database, int $filme_id): array
+    public static function buscarAvaliacoesFilme(Database $database, int $filme_id, ?int $usuario_id = null): array
     {
         return self::queryFilmeAvaliacao(
             $database,
             where: 'f.id = :filme_id',
-            params: ['filme_id' => $filme_id]
+            params: ['filme_id' => $filme_id],
+            usuario_id: $usuario_id
         )->fetchAll();
     }
 

@@ -7,6 +7,7 @@ use Cinebox\App\Core\Database;
 use Cinebox\App\Services\FilmeService;
 use Cinebox\App\Services\AvaliacaoService;
 use Cinebox\App\Middlewares\AuthMiddleware;
+use Cinebox\App\Middlewares\OptionalAuthMiddleware;
 use Cinebox\App\Helpers\Response;
 use Cinebox\App\Helpers\Request;
 
@@ -41,13 +42,16 @@ class FilmeController extends BaseController
     public function show(int $id): void
     {
         $this->safe(function () use ($id): void {
+            $payload = (new OptionalAuthMiddleware())->handle();
+            $usuario_id = $payload->id ?? null; 
+
             $filme = $this->filmeService->buscarFilmePorId($id);
 
             if (!$filme) {
                 Response::error('Filme não encontrado!', [], 404);
             }
 
-            $avaliacoes = $this->avaliacaoService->listarAvaliacoes($id);
+            $avaliacoes = $this->avaliacaoService->listarAvaliacoes($id, $usuario_id);
 
             Response::success('Filme localizados com sucesso!', [
                 'filme' => $filme,
@@ -93,7 +97,8 @@ class FilmeController extends BaseController
                     'id' => $filme->id,
                     'titulo' => $filme->titulo,
                     'diretor' => $filme->diretor,
-                    'categoria' => $filme->categoria
+                    'categoria' => $filme->categoria,
+                    'imagem' => $filme->imagem,
                 ]
             ]);
         });
