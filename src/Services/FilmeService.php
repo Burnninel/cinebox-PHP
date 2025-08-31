@@ -28,10 +28,10 @@ class FilmeService extends BaseService
         }
     }
 
-    public function buscarFilmes(string $pesquisar): array
+    public function buscarFilmes(string $pesquisar, ?int $usuario_id = null): array
     {
         return $this->safe(
-            fn() => Filme::buscarFilmes($this->database, $pesquisar),
+            fn() => Filme::buscarFilmes($this->database, $pesquisar, $usuario_id),
             'Erro ao buscar filmes no banco de dados.'
         );
     }
@@ -60,7 +60,7 @@ class FilmeService extends BaseService
             'titulo' => ['required', 'min:3', 'unique:filmes'],
             'diretor' => ['required', 'min:6', 'string'],
             'categoria' => ['required', 'string'],
-            'sinopse' => ['required', 'string'],
+            'sinopse' => ['required'],
             'ano_de_lancamento' => [
                 'required',
                 'numeric',

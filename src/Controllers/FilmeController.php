@@ -43,7 +43,7 @@ class FilmeController extends BaseController
     {
         $this->safe(function () use ($id): void {
             $payload = (new OptionalAuthMiddleware())->handle();
-            $usuario_id = $payload->id ?? null; 
+            $usuario_id = $payload->id ?? null;
 
             $filme = $this->filmeService->buscarFilmePorId($id);
 
@@ -64,8 +64,13 @@ class FilmeController extends BaseController
     {
         $this->safe(function (): void {
             $usuario = $this->authMiddleware->handle();
+            $pesquisar = trim($_GET['pesquisar'] ?? '');
 
-            $filmes = $this->filmeService->buscarFilmesUsuario($usuario->id);
+             if ($pesquisar) {
+                $filmes = $this->filmeService->buscarFilmes($pesquisar, $usuario->id);
+            } else {
+                $filmes = $this->filmeService->buscarFilmesUsuario($usuario->id);
+            }
 
             if (empty($filmes)) {
                 Response::success('Nenhum filme encontrado para este usuário.', [
