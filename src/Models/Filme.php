@@ -15,9 +15,11 @@ class Filme
     public string $categoria;
     public int $total_avaliacoes;
     public ?float $media_avaliacoes;
+    public string $imagem;
 
-    public function queryFilmes(Database $database, string $where = '', array $params = []): PDOStatement
+    public function queryFilmes(Database $database, string $where = "", array $params = []): PDOStatement
     {
+
         $sql = "
             SELECT 
                 f.*,
@@ -51,17 +53,34 @@ class Filme
         )->fetch() ?: null;
     }
 
-    public static function buscarFilmes(Database $database, string $pesquisar): array
+    public static function buscarFilmes(Database $database, string $pesquisar, ?int $usuario_id = null): array
     {
+        $whereClauses = [];
+        $params = [];
+
         if (!$pesquisar) {
             return (new self)->queryFilmes($database)->fetchAll();
         }
 
-        $where = 'LOWER(f.titulo) LIKE :pesquisar 
-                  OR LOWER(f.diretor) LIKE :pesquisar 
-                  OR LOWER(f.categoria) LIKE :pesquisar';
+        if ($pesquisar) {
+            $whereClauses[] = "
+                (LOWER(f.titulo) LIKE :pesquisar 
+                OR LOWER(f.diretor) LIKE :pesquisar 
+                OR LOWER(f.categoria) LIKE :pesquisar)
+            ";
+            $params['pesquisar'] = "%$pesquisar%";
+        }
 
-        $params = ['pesquisar' => "%$pesquisar%"];
+        if ($usuario_id !== null) {
+            $whereClauses[]  = "EXISTS (
+                SELECT 1
+                FROM usuarios_filmes uf
+                WHERE uf.filme_id = f.id AND uf.usuario_id = :usuario_id
+            )";
+            $params['usuario_id'] = $usuario_id;
+        }
+        
+        $where = implode(' AND ', $whereClauses);
 
         return (new self)->queryFilmes($database, $where, $params)->fetchAll();
     }
@@ -82,8 +101,8 @@ class Filme
     public static function criarFilme(Database $database, array $dados, int $usuario_id): string
     {
         $database->query(
-            query: "INSERT INTO filmes (titulo, diretor, ano_de_lancamento, sinopse, categoria)
-                VALUES (:titulo, :diretor, :ano_de_lancamento, :sinopse, :categoria)",
+            query: "INSERT INTO filmes (titulo, diretor, ano_de_lancamento, sinopse, categoria, imagem)
+                VALUES (:titulo, :diretor, :ano_de_lancamento, :sinopse, :categoria, :imagem)",
             params: $dados
         );
 
